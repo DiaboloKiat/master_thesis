@@ -1,0 +1,5 @@
+[submodule "catkin_ws/src/pozyx_uwb"]
+	path = catkin_ws/src/pozyx_uwb
+	url = git@github.com:DiaboloKiat/pozyx_uwb.git
+	ignore = dirty
+
