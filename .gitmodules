@@ -2,4 +2,7 @@
 	path = catkin_ws/src/pozyx_uwb
 	url = git@github.com:DiaboloKiat/pozyx_uwb.git
 	ignore = dirty
-
+[submodule "catkin_ws/src/vrx"]
+	path = catkin_ws/src/vrx
+	url = git@github.com:DiaboloKiat/vrx.git
+	ignore = dirty
