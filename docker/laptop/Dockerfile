@@ -187,6 +187,10 @@ RUN pip2 install --upgrade pip setuptools
 RUN pip2 install \
     scipy
 
+######################################## Pozyx ########################################
+
+RUN pip3 install pypozyx requests
+
 ######################################## procman ########################################
 
 RUN cd ${HOME} && git clone https://github.com/lcm-proj/lcm \
