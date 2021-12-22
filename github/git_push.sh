@@ -13,9 +13,9 @@ REPO=master_thesis
 
 BRANCH=master
 echo "---------------------------------------------------------------------------------------------------"
-source ~/$PROJECT/github/git_branch.sh
+source ~/$REPO/github/git_branch.sh
 echo "---------------------------------------------------------------------------------------------------"
-source ~/$PROJECT/github/git_pull.sh base
+source ~/$REPO/github/git_pull.sh base
 
 
 PULLSTAT=$?
