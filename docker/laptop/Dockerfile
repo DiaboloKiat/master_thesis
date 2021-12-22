@@ -43,6 +43,8 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
     build-essential \
     libcanberra-gtk-module \
     libcanberra-gtk3-module \
+    libpcap-dev \
+    libusb-1.0 \
     software-properties-common \
     ruby \
     python3-pip \
@@ -52,9 +54,12 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
     python3-opencv \
     python3-dbg \
     python3-venv \
+    python3-scipy \
+    python3-yaml \
     qtbase5-dev \
     unzip \
     git \
+    udev \
     && add-apt-repository -y ppa:git-core/ppa \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -90,6 +95,8 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     ros-$ROS_DISTRO-effort-controllers \
     ros-$ROS_DISTRO-geographic-info \
     ros-$ROS_DISTRO-hector-gazebo-plugins \
+    ros-$ROS_DISTRO-hector-gazebo \
+    ros-$ROS_DISTRO-hector-trajectory-server \
     ros-$ROS_DISTRO-joint-state-controller \
     ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-joy \
@@ -120,6 +127,11 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     ros-$ROS_DISTRO-geodesy \
     ros-$ROS_DISTRO-ddynamic-reconfigure \
     ros-$ROS_DISTRO-rviz-imu-plugin \
+    ros-$ROS_DISTRO-rosserial-arduino \
+    ros-$ROS_DISTRO-rosserial \
+    ros-$ROS_DISTRO-cv-bridge \
+    ros-$ROS_DISTRO-perception \
+    ros-$ROS_DISTRO-navigation \
     python3-catkin-tools \
     python3-rosdep \
     python3-rosinstall \
@@ -139,6 +151,7 @@ RUN pip3 -V
 RUN pip3 install --upgrade pip setuptools
 
 RUN pip3 install --upgrade \
+    catkin-tools \
     gym \
     matplotlib \
     pandas \
@@ -147,12 +160,13 @@ RUN pip3 install --upgrade \
     jupyter \
     jupyter_http_over_ws \
     rospkg \
-    catkin-tools \
     scikit-image \
     scikit-learn \
     zerorpc \
     gdown
-    
+
+RUN pip3 install pyyaml \
+    cython
 
 RUN pip3 install \
     torch==1.8.0+cu111 \
@@ -186,10 +200,6 @@ RUN pip2 install --upgrade pip setuptools
 
 RUN pip2 install \
     scipy
-
-######################################## Pozyx ########################################
-
-RUN pip3 install pypozyx requests
 
 ######################################## procman ########################################
 
