@@ -6,7 +6,7 @@ git config --global user.email "DiaboloKiat@gmail.com"
 git status
 git checkout master
 echo "Enter your message"
-read message
+read message_base
 
 PROJECT=master_thesis
 REPO=master_thesis
@@ -48,7 +48,7 @@ echo "************************************** push project_seadrone *************
 echo "----------------------------------------------------------------------------------------------------"
 cd ~/$REPO
 git add -A
-git commit -m "${message} on project_seadrone"
+git commit -m "${message_base} on project_seadrone"
 git push
 
 
