@@ -1,10 +1,8 @@
 #!/bin/bash
 
-PROJECT=master_thesis
 REPO=master_thesis
 
-
-cd ~/$PROJECT
+cd ~/$REPO
 git status
 
 ############################## submodules ####################################

@@ -8,7 +8,6 @@ git checkout master
 echo "Enter your message"
 read message_base
 
-PROJECT=master_thesis
 REPO=master_thesis
 
 BRANCH=master

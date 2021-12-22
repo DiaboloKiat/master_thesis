@@ -2,7 +2,6 @@
 
 if [ "$1" = "base" ]
 then
-    PROJECT=master_thesis
     REPO=master_thesis
 
     BRANCH=master
@@ -20,7 +19,6 @@ then
         return 1
     fi
 else
-    PROJECT=master_thesis
     REPO=master_thesis
 
     echo "---------------------------------------------------------------------------------------------------"
