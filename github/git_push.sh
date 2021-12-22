@@ -13,18 +13,16 @@ REPO=master_thesis
 
 BRANCH=master
 echo "---------------------------------------------------------------------------------------------------"
-source ~/$REPO/github/git_branch.sh
-pwd
-echo "$REPO"
+source ~/$PROJECT/github/git_branch.sh
 echo "---------------------------------------------------------------------------------------------------"
-source ~/$REPO/github/git_pull.sh base
-pwd
+source ~/$PROJECT/github/git_pull.sh base
+
 
 PULLSTAT=$?
 if [ "$PULLSTAT" -gt 0 ]
 then
    echo "There is conflict. Aborting"
-   cd ~/$REPO
+   cd $cur_path/
    return
 fi
 echo "---------------------------------------------------------------------------------------------------"
