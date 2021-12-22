@@ -8,22 +8,16 @@ git checkout master
 echo "Enter your message"
 read message
 
-if [ "$1" = "base" ]
-then
-    PROJECT=master_thesis
-    REPO=master_thesis
-else
-    echo "Please enter your project"
-    return 0
-fi
+PROJECT=master_thesis
+REPO=master_thesis
 
 BRANCH=master
 echo "---------------------------------------------------------------------------------------------------"
-source ~/$REPO/github/git_branch.sh $1
+source ~/$REPO/github/git_branch.sh
 pwd
 echo "$REPO"
 echo "---------------------------------------------------------------------------------------------------"
-source ~/$REPO/github/git_pull.sh $1
+source ~/$REPO/github/git_pull.sh base
 pwd
 
 PULLSTAT=$?
