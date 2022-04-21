@@ -6,3 +6,11 @@
 	path = catkin_ws/src/vrx
 	url = git@github.com:DiaboloKiat/vrx.git
 	ignore = dirty
+[submodule "catkin_ws/src/Turlebot/turtlebot3_simulations"]
+	path = catkin_ws/src/Turlebot/turtlebot3_simulations
+	url = git@github.com:DiaboloKiat/turtlebot3_simulations.git
+	ignore = dirty
+[submodule "catkin_ws/src/Turlebot/turtlebot3"]
+	path = catkin_ws/src/Turlebot/turtlebot3
+	url = git@github.com:DiaboloKiat/turtlebot3.git
+	ignore = dirty
