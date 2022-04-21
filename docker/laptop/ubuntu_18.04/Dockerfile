@@ -4,7 +4,6 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV ROS_DISTRO melodic
-ARG GAZ=gazebo11
 
 ######################################## User ########################################
 
@@ -86,61 +85,41 @@ RUN echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/
 RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 \
     && wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
 
-# install packages
+# install bootstrap tools
 RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true install --no-install-recommends -y \
-    ${GAZ} \
-    lib${GAZ}-dev \
     ros-$ROS_DISTRO-desktop-full \
-    ros-$ROS_DISTRO-gazebo-plugins \
-    ros-$ROS_DISTRO-gazebo-ros \
-    ros-$ROS_DISTRO-gazebo-ros-control \
-    ros-$ROS_DISTRO-gazebo-ros-pkgs \
-    ros-$ROS_DISTRO-effort-controllers \
-    ros-$ROS_DISTRO-geographic-info \
-    ros-$ROS_DISTRO-hector-gazebo-plugins \
-    ros-$ROS_DISTRO-hector-gazebo \
-    ros-$ROS_DISTRO-hector-trajectory-server \
-    ros-$ROS_DISTRO-joint-state-controller \
-    ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-joy \
-    ros-$ROS_DISTRO-joy-teleop \
-    ros-$ROS_DISTRO-kdl-parser-py \
-    ros-$ROS_DISTRO-key-teleop \
-    ros-$ROS_DISTRO-move-base \
-    ros-$ROS_DISTRO-robot-localization \
-    ros-$ROS_DISTRO-robot-state-publisher \
-    ros-$ROS_DISTRO-rqt \
-    ros-$ROS_DISTRO-rqt-common-plugins \
-    ros-$ROS_DISTRO-rqt-robot-plugins \
-    ros-$ROS_DISTRO-teleop-tools \
-    ros-$ROS_DISTRO-teleop-twist-joy \
-    ros-$ROS_DISTRO-teleop-twist-keyboard \
-    ros-$ROS_DISTRO-tf2-geometry-msgs \
-    ros-$ROS_DISTRO-tf2-tools \
-    ros-$ROS_DISTRO-urdfdom-py \
-    ros-$ROS_DISTRO-velodyne-gazebo-plugins \
-    ros-$ROS_DISTRO-xacro \
+    ros-$ROS_DISTRO-joystick-drivers \
     ros-$ROS_DISTRO-pointcloud-to-laserscan \
+    ros-$ROS_DISTRO-robot-localization \
     ros-$ROS_DISTRO-spacenav-node \
     ros-$ROS_DISTRO-tf2-sensor-msgs \
     ros-$ROS_DISTRO-twist-mux \
     ros-$ROS_DISTRO-velodyne-simulator \
+    ros-$ROS_DISTRO-serial \
     ros-$ROS_DISTRO-soem \
     ros-$ROS_DISTRO-openslam-gmapping \
     ros-$ROS_DISTRO-geodesy \
+    ros-$ROS_DISTRO-cartographer-* \
     ros-$ROS_DISTRO-ddynamic-reconfigure \
+    ros-$ROS_DISTRO-move-base-* \
     ros-$ROS_DISTRO-rviz-imu-plugin \
-    ros-$ROS_DISTRO-rosserial-arduino \
-    ros-$ROS_DISTRO-rosserial \
-    ros-$ROS_DISTRO-cv-bridge \
-    ros-$ROS_DISTRO-perception \
-    ros-$ROS_DISTRO-navigation \
-    python3-catkin-tools \
-    python3-rosdep \
-    python3-rosinstall \
-    python3-rosinstall-generator \
-    python3-wstool \
-    python3-vcstool \
+    ros-$ROS_DISTRO-libcreate \
+    ros-$ROS_DISTRO-moveit-* \
+    ros-$ROS_DISTRO-industrial* \
+    ros-$ROS_DISTRO-moveit-* \
+    ros-$ROS_DISTRO-industrial* \
+    ros-$ROS_DISTRO-effort-controllers \
+    ros-$ROS_DISTRO-ros-control \
+    ros-$ROS_DISTRO-ros-controllers \
+    ros-$ROS_DISTRO-lms1xx \
+    ros-$ROS_DISTRO-turtlebot3-msgs \
+    ros-$ROS_DISTRO-turtlebot3 \
+    ros-$ROS_DISTRO-ros-tutorials \
+    python-rosdep \
+    python-rosinstall \
+    python-rosinstall-generator \
+    python-wstool \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -220,6 +199,16 @@ RUN cd ${HOME} && git clone https://github.com/DiaboloKiat/procman \
     && cmake .. \
     && make install
 
+
+######################################## gazebo ########################################
+
+# pre download model
+RUN mkdir -p $HOME/.gazebo \
+    && cd $HOME/.gazebo \
+    && git clone https://github.com/osrf/gazebo_models.git \
+    && mv gazebo_models models \
+    && cd
+
 ######################################## realsense ########################################
 
 RUN apt-get update && apt-get install -y \
@@ -248,7 +237,7 @@ RUN wget https://github.com/IntelRealSense/librealsense/archive/v${LIBREALSENSE_
 
 RUN echo "root ALL=(ALL)  ALL" >> /etc/sudoers \
     && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc \
-    &&  echo "source ~/catkin_ws/install/setup.bash" >> ${HOME}/.bashrc \
+    &&  echo "source ~/catkin_ws/install/setup.bash" >> ${HOME}/.bashrc
 
 RUN chown -R ${NB_USER}:${NB_USER} ${HOME}/
 RUN echo "${NB_USER} ALL=(ALL)  ALL" > /etc/sudoers
