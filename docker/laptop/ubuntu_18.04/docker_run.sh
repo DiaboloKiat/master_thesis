@@ -57,5 +57,5 @@ docker run -it \
   $DOCKER_OPTS \
   --privileged \
   --security-opt seccomp=unconfined \
-  diabolokiat/kiat-thesis:laptop \
+  diabolokiat/kiat-thesis:laptop-ubuntu18.04 \
   bash

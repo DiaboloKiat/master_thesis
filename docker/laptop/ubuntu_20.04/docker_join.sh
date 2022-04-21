@@ -3,7 +3,7 @@
 # Typical usage: ./join.bash seadrone
 #
 
-IMG=diabolokiat/kiat-thesis:laptop
+IMG=diabolokiat/kiat-thesis:laptop-ubuntu20.04
 
 xhost +
 containerid=$(docker ps -aqf "ancestor=${IMG}")&& echo $containerid
