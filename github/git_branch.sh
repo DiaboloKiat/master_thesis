@@ -7,8 +7,22 @@ git checkout master
 
 ############################## submodules ####################################
 
+# ------------- vrx -------------- #
+
 source ~/$REPO/catkin_ws/src/vrx/github/git_branch.sh master_thesis
 cd ~/$REPO
 
+# ---------- Pozyx_UWB ----------- #
+
 source ~/$REPO/catkin_ws/src/pozyx_uwb/github/git_branch.sh master_thesis
 cd ~/$REPO
+
+# ---------- Turtlebot3 ---------- #
+
+cd ~/$REPO/catkin_ws/src/Turlebot/turtlebot3
+git checkout melodic-devel
+
+cd ~/$REPO/catkin_ws/src/Turtlebot/turtlebot3_simulations
+git checkout melodic-devel
+
+

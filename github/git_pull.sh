@@ -35,6 +35,38 @@ else
     source ~/$REPO/catkin_ws/src/pozyx_uwb/github/git_pull.sh master_thesis
     cd ~/$REPO
 
+    BRANCH=melodic-devel
+    echo "---------------------------------------------------------------------------------------------------"
+    echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< pull turtlebot3 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo "---------------------------------------------------------------------------------------------------"
+
+    cd ~/$REPO/catkin_ws/src/Turlebot/turtlebot3
+    git checkout $BRANCH
+    git pull
+    
+    CONFLICTS=$(git ls-files -u | wc -l)
+    if [ "$CONFLICTS" -gt 0 ]
+    then
+        echo "There is conflict in turtlebot3. Aborting"
+        return 1
+    fi
+
+    BRANCH=melodic-devel
+    echo "---------------------------------------------------------------------------------------------------"
+    echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< pull turtlebot3_simulations >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo "---------------------------------------------------------------------------------------------------"
+
+    cd ~/$REPO/catkin_ws/src/Turtlebot/turtlebot3_simulations
+    git checkout $BRANCH
+    git pull
+    
+    CONFLICTS=$(git ls-files -u | wc -l)
+    if [ "$CONFLICTS" -gt 0 ]
+    then
+        echo "There is conflict in turtlebot3_simulations. Aborting"
+        return 1
+    fi
+
     BRANCH=master
     echo "---------------------------------------------------------------------------------------------------"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< pull master_thesis >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
