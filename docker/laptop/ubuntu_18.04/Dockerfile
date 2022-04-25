@@ -1,9 +1,13 @@
+# Example:
+# 1) https://github.com/Field-Robotics-Lab/dockwater/blob/main/melodic/Dockerfile
+
 FROM nvidia/cuda:11.0.3-cudnn8-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV ROS_DISTRO melodic
+ARG GAZ=gazebo9
 
 ######################################## User ########################################
 
@@ -32,7 +36,10 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
     sudo \
     cmake \
     gedit \
+    gnupg \
     gnupg2 \
+    cppcheck \
+    curl \
     locales \
     dirmngr \
     mercurial \
@@ -43,9 +50,14 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
     libcanberra-gtk-module \
     libcanberra-gtk3-module \
     libpcap-dev \
+    libeigen3-dev \
+    libgles2-mesa-dev \
     libusb-1.0 \
+    lsb-release \
     software-properties-common \
     ruby \
+    pkg-config \
+    protobuf-compiler \
     python-gtk2 \
     python-gobject \
     python-tk \
@@ -70,7 +82,7 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt update \
     && apt install -y \
-        tzdata \
+    tzdata \
     && ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime \
     && dpkg-reconfigure --frontend noninteractive tzdata \
     && apt clean
@@ -88,14 +100,17 @@ RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E
 # install bootstrap tools
 RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true install --no-install-recommends -y \
     ros-$ROS_DISTRO-desktop-full \
+    ${GAZ} \
+    lib${GAZ}-dev \
     ros-$ROS_DISTRO-joy \
+    ros-$ROS_DISTRO-joy-teleop \
     ros-$ROS_DISTRO-joystick-drivers \
     ros-$ROS_DISTRO-pointcloud-to-laserscan \
     ros-$ROS_DISTRO-robot-localization \
+    ros-$ROS_DISTRO-robot-state-publisher \
     ros-$ROS_DISTRO-spacenav-node \
     ros-$ROS_DISTRO-tf2-sensor-msgs \
     ros-$ROS_DISTRO-twist-mux \
-    ros-$ROS_DISTRO-velodyne-simulator \
     ros-$ROS_DISTRO-serial \
     ros-$ROS_DISTRO-soem \
     ros-$ROS_DISTRO-openslam-gmapping \
@@ -116,6 +131,30 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     ros-$ROS_DISTRO-turtlebot3-msgs \
     ros-$ROS_DISTRO-turtlebot3 \
     ros-$ROS_DISTRO-ros-tutorials \
+    ros-$ROS_DISTRO-geographic-info \
+    ros-$ROS_DISTRO-hector-gazebo-plugins \
+    ros-$ROS_DISTRO-hector-gazebo \
+    ros-$ROS_DISTRO-gazebo-plugins \
+    ros-$ROS_DISTRO-gazebo-ros \
+    ros-$ROS_DISTRO-gazebo-ros-control \
+    ros-$ROS_DISTRO-gazebo-ros-pkgs \
+    ros-$ROS_DISTRO-velodyne-gazebo-plugins \
+    ros-$ROS_DISTRO-velodyne-simulator \
+    ros-$ROS_DISTRO-joint-state-controller \
+    ros-$ROS_DISTRO-joint-state-publisher \
+    ros-$ROS_DISTRO-ros-base \
+    ros-$ROS_DISTRO-rqt \
+    ros-$ROS_DISTRO-rqt-common-plugins \
+    ros-$ROS_DISTRO-rqt-robot-plugins \
+    ros-$ROS_DISTRO-rviz \
+    ros-$ROS_DISTRO-teleop-tools \
+    ros-$ROS_DISTRO-teleop-twist-joy \
+    ros-$ROS_DISTRO-teleop-twist-keyboard \
+    ros-$ROS_DISTRO-tf2-geometry-msgs \
+    ros-$ROS_DISTRO-tf2-tools \
+    ros-$ROS_DISTRO-urdfdom-py \
+    ros-$ROS_DISTRO-xacro \
+    python-vcstool \
     python-rosdep \
     python-rosinstall \
     python-rosinstall-generator \
@@ -134,8 +173,9 @@ RUN pip3 install --upgrade pip setuptools
 
 RUN pip3 install --upgrade \
     catkin-tools \
-    gym \
+    gym==0.15.7 \
     matplotlib \
+    numpy \
     pandas \
     pypozyx \
     requests \
@@ -167,12 +207,12 @@ RUN pip3 install \
     dm-sonnet==2.0.0 \
     dm-tree==0.1.5
 
-RUN pip3 install \
-    dm-acme[jax]==0.2.0 \
-    dm-acme[envs]==0.2.0
+# RUN pip3 install \
+#     dm-acme[jax]==0.2.0 \
+#     dm-acme[envs]==0.2.0
 
-#RUN pip3 install -U 'jedi<0.18.0' \
-#    && jupyter serverextension enable --py jupyter_http_over_ws
+RUN pip3 install -U 'jedi<0.18.0' \
+   && jupyter serverextension enable --py jupyter_http_over_ws
 
 ######################################## PIP2 ########################################
 RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py \
@@ -209,6 +249,13 @@ RUN mkdir -p $HOME/.gazebo \
     && mv gazebo_models models \
     && cd
 
+# Optional: Dev. tools, applications, etc.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gdb \
+    psmisc \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
 ######################################## realsense ########################################
 
 RUN apt-get update && apt-get install -y \
@@ -236,8 +283,7 @@ RUN wget https://github.com/IntelRealSense/librealsense/archive/v${LIBREALSENSE_
 ######################################## Setting ########################################
 
 RUN echo "root ALL=(ALL)  ALL" >> /etc/sudoers \
-    && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc \
-    &&  echo "source ~/catkin_ws/install/setup.bash" >> ${HOME}/.bashrc
+    && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc
 
 RUN chown -R ${NB_USER}:${NB_USER} ${HOME}/
 RUN echo "${NB_USER} ALL=(ALL)  ALL" > /etc/sudoers

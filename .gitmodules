@@ -14,3 +14,6 @@
 	path = catkin_ws/src/Turlebot/turtlebot3
 	url = git@github.com:DiaboloKiat/turtlebot3.git
 	ignore = dirty
+[submodule "catkin_ws/src/ARG/real_to_sim_env"]
+	path = catkin_ws/src/ARG/real_to_sim_env
+	url = git@github.com:ARG-NCTU/real_to_sim_env.git
