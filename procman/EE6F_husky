@@ -7,12 +7,14 @@ cmd "02_EE6F" {
     host = "localhost";
 }
 cmd "03_husky" {
-    exec = "roslaunch husky_ur5 spawn_robot.launch x:=27.5 y:=-23.47 z:=0.13 yaw:=-3.13";
+    exec = "roslaunch subt_example one_robot.launch";
     host = "localhost";
 }
 
 
-script "open_env" {
+script "open_EE6F_husky" {
     start cmd "01_core" wait "running";
+    wait ms 2000;
+    start cmd "02_EE6F" wait "running";
     wait ms 2000;
 }
