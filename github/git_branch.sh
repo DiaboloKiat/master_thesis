@@ -7,6 +7,14 @@ git checkout master
 
 ############################## submodules ####################################
 
+# ------------- ARG -------------- #
+cd ~/$REPO/catkin_ws/src/ARG/real_to_sim_env
+git checkout main
+
+cd ~/$REPO/catkin_ws/src/ARG/subt-gazebo
+git checkout devel-kiat
+
+
 # ------------- vrx -------------- #
 
 source ~/$REPO/catkin_ws/src/vrx/github/git_branch.sh master_thesis

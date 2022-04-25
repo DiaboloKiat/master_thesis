@@ -1,0 +1,18 @@
+cmd "01_core" {
+    exec = "roscore";
+    host = "localhost";
+}
+cmd "02_EE6F" {
+    exec = "roslaunch real_to_sim_env gazebo_world.launch world:=EE6F";
+    host = "localhost";
+}
+cmd "03_husky" {
+    exec = "roslaunch husky_ur5 spawn_robot.launch x:=27.5 y:=-23.47 z:=0.13 yaw:=-3.13";
+    host = "localhost";
+}
+
+
+script "open_env" {
+    start cmd "01_core" wait "running";
+    wait ms 2000;
+}

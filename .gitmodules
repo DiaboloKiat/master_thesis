@@ -17,3 +17,8 @@
 [submodule "catkin_ws/src/ARG/real_to_sim_env"]
 	path = catkin_ws/src/ARG/real_to_sim_env
 	url = git@github.com:ARG-NCTU/real_to_sim_env.git
+	ignore = dirty
+[submodule "catkin_ws/src/ARG/subt-gazebo"]
+	path = catkin_ws/src/ARG/subt-gazebo
+	url = git@github.com:ARG-NCTU/subt-gazebo.git
+	ignore = dirty
