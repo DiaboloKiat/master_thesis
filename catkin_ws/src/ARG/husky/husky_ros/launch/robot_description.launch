@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="robot_namespace" default="robot"/>
+  <arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface" />
+
+  <param name="robot_description" command="$(find xacro)/xacro '$(find husky_ros)/urdf/husky.urdf.xacro'
+    robot_namespace:=$(arg robot_namespace)" />
+
+</launch>

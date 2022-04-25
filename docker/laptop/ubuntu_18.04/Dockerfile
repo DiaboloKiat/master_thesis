@@ -162,10 +162,6 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# bootstrap rosdep
-RUN rosdep init \
-    && rosdep update
-
 ######################################## PIP ########################################
 RUN pip3 -V 
 
@@ -241,6 +237,36 @@ RUN cd ${HOME} && git clone https://github.com/DiaboloKiat/procman \
 
 
 ######################################## gazebo ########################################
+# add ssh key in docker and clone repo
+ARG ssh_prv_key
+ARG ssh_pub_key
+
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts
+
+# Add the keys and set permissions
+RUN echo "$ssh_prv_key" > /root/.ssh/id_ed25519 && \
+    echo "$ssh_pub_key" > /root/.ssh/id_ed25519.pub && \
+    chmod 600 /root/.ssh/id_ed25519 && \
+    chmod 600 /root/.ssh/id_ed25519.pub
+
+RUN git clone --recursive git@github.com:ARG-NCTU/subt-gazebo.git /subt_ws \
+    && cd /subt_ws \
+    && mkdir -p ${HOME}/catkin_ws/src \
+    && apt-get -o Acquire::ForceIPv4=true update \
+    && cp -R /subt_ws ${HOME}/catkin_ws/src/. \
+    && cd ${HOME}/catkin_ws \
+    && wget https://s3.amazonaws.com/osrf-distributions/subt_robot_examples/releases/subt_robot_examples_latest.tgz \
+    && tar xvf subt_robot_examples_latest.tgz \
+    && /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && rosdep init" \
+    && /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && rosdep update && rosdep install --as-root apt:false --from-paths src --ignore-src -r -y" \
+    && rm -rf /var/lib/apt/lists/* \
+    && /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && catkin_make install" \
+    && rm -fr /subt_ws 
+
+RUN echo "source ~/catkin_ws/install/setup.bash" >> ${HOME}/.bashrc
 
 # pre download model
 RUN mkdir -p $HOME/.gazebo \
@@ -283,7 +309,9 @@ RUN wget https://github.com/IntelRealSense/librealsense/archive/v${LIBREALSENSE_
 ######################################## Setting ########################################
 
 RUN echo "root ALL=(ALL)  ALL" >> /etc/sudoers \
-    && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc
+    && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc \
+    && echo "source ~/catkin_ws/install/setup.bash" >> ${HOME}/.bashrc \
+    && echo "cd ~/master_thesis" >> ${HOME}/.bashrc 
 
 RUN chown -R ${NB_USER}:${NB_USER} ${HOME}/
 RUN echo "${NB_USER} ALL=(ALL)  ALL" > /etc/sudoers

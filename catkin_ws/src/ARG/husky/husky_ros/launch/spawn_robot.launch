@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="robot_namespace" default="robot"/>
+  <arg name="debug" default="false"/>
+
+  <arg name="x" default="7"/>
+  <arg name="y" default="8"/>
+  <arg name="z" default="0.3"/>
+  <arg name="yaw" default="2"/>
+
+  <!-- Optionally disable teleop control -->
+  <arg name="joystick" default="true" />
+
+  <group ns="$(arg robot_namespace)">
+
+    <include file="$(find husky_ros)/launch/robot_control.launch">
+        <arg name="robot_namespace" value="$(arg robot_namespace)" />
+    </include>
+
+    <include file="$(find husky_control)/launch/teleop.launch">
+        <arg name="joystick" value="$(arg joystick)" />
+    </include>
+    <!-- Spawn robot in gazebo -->
+    <node name="spawn_robot_model" pkg="gazebo_ros" type="spawn_model"
+        args="-x $(arg x)
+              -y $(arg y)
+              -z $(arg z)
+              -Y $(arg yaw)
+              -unpause
+              -urdf
+              -param robot_description
+              -model robot
+              -robot_namespace $(arg robot_namespace)" />
+
+  </group>
+
+</launch>

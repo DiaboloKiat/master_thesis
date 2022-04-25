@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="veh" default="robot" />
+
+    <group ns="$(arg veh)">
+        <node pkg="husky_ros" type="pub_gazebo_tf.py" name="pub_gazebo_tf" output="screen" />
+    </group>
+</launch>
