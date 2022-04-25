@@ -71,10 +71,12 @@ git add -A
 git commit -m "${message_base} on real_to_sim_env"
 git push
 
+BRANCH=devel-kiat
 echo "---------------------------------------------------------------------------------------------------"
 echo "******************************************** push subt-gazebo *************************************"
 echo "---------------------------------------------------------------------------------------------------"
 cd ~/$REPO/catkin_ws/src/ARG/subt-gazebo
+git checkout $BRANCH
 git add -A
 git commit -m "${message_base} on subt-gazebo"
 git push
