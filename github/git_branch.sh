@@ -30,7 +30,9 @@ cd ~/$REPO
 cd ~/$REPO/catkin_ws/src/Turlebot/turtlebot3
 git checkout melodic-devel
 
-cd ~/$REPO/catkin_ws/src/Turtlebot/turtlebot3_simulations
+cd ~/$REPO/catkin_ws/src/Turlebot/turtlebot3_simulations/
 git checkout melodic-devel
 
 
+
+cd ~/$REPO
