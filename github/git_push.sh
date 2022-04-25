@@ -56,7 +56,7 @@ git push
 echo "---------------------------------------------------------------------------------------------------"
 echo "************************************ push turtlebot3_simulations **********************************"
 echo "---------------------------------------------------------------------------------------------------"
-cd ~/$REPO/catkin_ws/src/Turtlebot/turtlebot3_simulations
+cd ~/$REPO/catkin_ws/src/Turlebot/turtlebot3_simulations
 git add -A
 git commit -m "${message_base} on turtlebot3_simulations"
 git push
