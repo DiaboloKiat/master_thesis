@@ -6,15 +6,13 @@ cmd "02_EE6F" {
     exec = "roslaunch real_to_sim_env gazebo_world.launch world:=EE6F";
     host = "localhost";
 }
-group "Husky" {
-    cmd "01_husky" {
-        exec = "roslaunch husky_ros spawn_robot.launch x:=27.5 y:=-23.47 z:=0.13 yaw:=-3.13";
-        host = "localhost";
-    }
-    cmd "02_husky_tf" {
-        exec = "roslaunch husky_ros pub_tf.launch";
-        host = "localhost";
-    }
+cmd "03_husky" {
+    exec = "roslaunch husky_ros spawn_robot.launch x:=27.5 y:=-23.47 z:=0.13 yaw:=-3.13";
+    host = "localhost";
+}
+cmd "04_husky_tf" {
+    exec = "roslaunch husky_ros pub_tf.launch";
+    host = "localhost";
 }
 group "Pozyx" {
     cmd "01_pozyx_setup" {
