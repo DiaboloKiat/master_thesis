@@ -59,7 +59,7 @@ else
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< pull turtlebot3_simulations >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     echo "---------------------------------------------------------------------------------------------------"
 
-    cd ~/$REPO/catkin_ws/src/Turtlebot/turtlebot3_simulations
+    cd ~/$REPO/catkin_ws/src/Turlebot/turtlebot3_simulations
     git checkout $BRANCH
     git pull
     
