@@ -2,7 +2,7 @@ build/
 devel/
 __pycache__/
 CMakeLists.txt
-
+bag/
 
 .catkin_workspace
 *.vscode
