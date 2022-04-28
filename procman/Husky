@@ -1,0 +1,57 @@
+cmd "00_core" {
+    exec = "roscore";
+    host = "localhost";
+}
+
+group "01_World_EE6F" {
+    cmd "01_EE6F" {
+    exec = "roslaunch real_to_sim_env gazebo_world.launch world:=EE6F";
+    host = "localhost";
+    }
+    cmd "02_pozyx_setup" {
+        exec = "roslaunch pozyx_simulation uwb_EE6F_anchors_set.launch";
+        host = "localhost";
+    }
+    cmd "03_husky" {
+    exec = "roslaunch husky_ros spawn_robot.launch x:=27.5 y:=-23.47 z:=0.13 yaw:=-3.13";
+    host = "localhost";
+    }
+    cmd "04_husky_tf" {
+    exec = "roslaunch husky_ros pub_tf.launch";
+    host = "localhost";
+    }
+    cmd "05_pozyx_ranging" {
+        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot";
+        host = "localhost";
+    }
+}
+
+group "02_World_Husky" {
+    cmd "01_husky_world" {
+    exec = "roslaunch husky_gazebo husky_world.launch";
+    host = "localhost";
+    }
+    cmd "02_pozyx_setup" {
+        exec = "roslaunch pozyx_simulation uwb_husky_world_anchors_set.launch";
+        host = "localhost";
+    }
+    cmd "03_husky_tf" {
+    exec = "roslaunch husky_ros pub_tf.launch";
+    host = "localhost";
+    }
+    cmd "04_pozyx_ranging" {
+        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot";
+        host = "localhost";
+    }
+}
+
+cmd "Rviz" {
+    exec = "rviz -d rviz/husky_EE6F.rviz";
+    host = "localhost";
+}
+
+
+script "open_husky" {
+    start cmd "00_core" wait "running";
+    wait ms 2000;
+}
