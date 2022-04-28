@@ -19,6 +19,10 @@ group "Pozyx" {
         exec = "roslaunch pozyx_simulation uwb_EE6F_anchors_set.launch";
         host = "localhost";
     }
+    cmd "02_pozyx_ranging" {
+        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot";
+        host = "localhost";
+    }
 }
 
 cmd "Rviz" {

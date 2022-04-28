@@ -16,8 +16,8 @@ class WheelTF(object):
         self.broadcaster = tf.TransformBroadcaster()
         self.fram_name = rospy.get_param("~frame_name", "base_link")
         self.paraent_name = rospy.get_param("~parent_name", "map")
-        self.pub_pose = rospy.Publisher("truth_map_posestamped", PoseStamped, queue_size=1)
-        self.pub_odometry = rospy.Publisher('truth_map_odometry', Odometry, queue_size=1)
+        self.pub_pose = rospy.Publisher("truth_map_posestamped", PoseStamped, queue_size=10)
+        self.pub_odometry = rospy.Publisher('truth_map_odometry', Odometry, queue_size=10)
         self.get_model = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 
     def gazebo_odom(self):

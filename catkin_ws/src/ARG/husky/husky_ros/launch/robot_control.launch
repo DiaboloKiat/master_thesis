@@ -25,7 +25,7 @@
   </group>
 
   <node pkg="interactive_marker_twist_server" type="marker_server" name="twist_marker_server" output="screen">
-    <param name="link_name" value="base_link" />
+    <param name="link_name" value="map" />
   </node>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />

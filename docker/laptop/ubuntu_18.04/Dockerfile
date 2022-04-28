@@ -128,6 +128,7 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     ros-$ROS_DISTRO-ros-control \
     ros-$ROS_DISTRO-ros-controllers \
     ros-$ROS_DISTRO-lms1xx \
+    ros-$ROS_DISTRO-dynamixel-sdk \
     ros-$ROS_DISTRO-turtlebot3-msgs \
     ros-$ROS_DISTRO-turtlebot3 \
     ros-$ROS_DISTRO-ros-tutorials \
@@ -143,7 +144,7 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     ros-$ROS_DISTRO-joint-state-controller \
     ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-ros-base \
-    ros-$ROS_DISTRO-rqt \
+    ros-$ROS_DISTRO-rqt* \
     ros-$ROS_DISTRO-rqt-common-plugins \
     ros-$ROS_DISTRO-rqt-robot-plugins \
     ros-$ROS_DISTRO-rviz \
@@ -154,6 +155,21 @@ RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=t
     ros-$ROS_DISTRO-tf2-tools \
     ros-$ROS_DISTRO-urdfdom-py \
     ros-$ROS_DISTRO-xacro \
+    ros-$ROS_DISTRO-urdf \
+    ros-$ROS_DISTRO-laser-proc \
+    ros-$ROS_DISTRO-rgbd-launch \
+    ros-$ROS_DISTRO-depthimage-to-laserscan \
+    ros-$ROS_DISTRO-rosserial-arduino \
+    ros-$ROS_DISTRO-rosserial-python \
+    ros-$ROS_DISTRO-rosserial-server \
+    ros-$ROS_DISTRO-rosserial-client \
+    ros-$ROS_DISTRO-rosserial-msgs \
+    ros-$ROS_DISTRO-amcl \
+    ros-$ROS_DISTRO-map-server \
+    ros-$ROS_DISTRO-gmapping \
+    ros-$ROS_DISTRO-navigation \
+    ros-$ROS_DISTRO-interactive-markers \
+    ros-$ROS_DISTRO-compressed-image-transport \
     python-vcstool \
     python-rosdep \
     python-rosinstall \
@@ -311,7 +327,8 @@ RUN wget https://github.com/IntelRealSense/librealsense/archive/v${LIBREALSENSE_
 RUN echo "root ALL=(ALL)  ALL" >> /etc/sudoers \
     && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc \
     && echo "source ~/catkin_ws/install/setup.bash" >> ${HOME}/.bashrc \
-    && echo "cd ~/master_thesis" >> ${HOME}/.bashrc 
+    && echo "cd ~/master_thesis" >> ${HOME}/.bashrc \
+    && echo "export TURTLEBOT3_MODEL=burger" >> ${HOME}/.bashrc
 
 RUN chown -R ${NB_USER}:${NB_USER} ${HOME}/
 RUN echo "${NB_USER} ALL=(ALL)  ALL" > /etc/sudoers
