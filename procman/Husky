@@ -21,18 +21,18 @@ group "01_World_EE6F" {
     host = "localhost";
     }
     cmd "05_pozyx_ranging" {
-        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot";
+        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=EE6F";
         host = "localhost";
     }
 }
 
-group "02_World_Husky" {
+group "02_World_Square" {
     cmd "01_husky_world" {
     exec = "roslaunch husky_gazebo husky_world.launch";
     host = "localhost";
     }
     cmd "02_pozyx_setup" {
-        exec = "roslaunch pozyx_simulation uwb_husky_world_anchors_set.launch";
+        exec = "roslaunch pozyx_simulation uwb_square_anchors_set.launch";
         host = "localhost";
     }
     cmd "03_husky_tf" {
@@ -40,7 +40,7 @@ group "02_World_Husky" {
     host = "localhost";
     }
     cmd "04_pozyx_ranging" {
-        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot";
+        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=square";
         host = "localhost";
     }
 }
