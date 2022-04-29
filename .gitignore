@@ -2,10 +2,12 @@ build/
 devel/
 __pycache__/
 CMakeLists.txt
-bag/
+
 
 .catkin_workspace
 *.vscode
 *.mp4
 *.pyc
 *.pyo
+.bag
+.csv
