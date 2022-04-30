@@ -233,7 +233,9 @@ RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py \
 RUN pip2 install --upgrade pip setuptools
 
 RUN pip2 install \
-    scipy
+    pypozyx \
+    requests \
+    scipy 
 
 ######################################## procman ########################################
 
