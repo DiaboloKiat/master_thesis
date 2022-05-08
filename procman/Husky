@@ -51,6 +51,16 @@ group "02_World_Square" {
         exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot";
         host = "localhost";
     }
+    group "07_navigation" {
+        cmd "01_navigation" {
+        exec = "roslaunch navigation waypoint_navigation.launch veh:=robot";
+        host = "localhost";
+        }
+        cmd "RQT_GUI" {
+        exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+        host = "localhost";
+        }
+    }
 }
 
 group "Rviz" {
