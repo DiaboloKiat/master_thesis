@@ -1,0 +1,9 @@
+<launch>
+    <arg name="veh" default="robot"/> 
+
+    <group ns="$(arg veh)">
+        <node pkg="navigation" type="waypoint_navigation.py" name="waypoint_navigation" respawn="false" output="screen">
+        </node>
+    </group>
+
+</launch>
