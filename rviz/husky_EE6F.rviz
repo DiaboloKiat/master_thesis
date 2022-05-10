@@ -73,6 +73,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        bumper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         front_bumper_link:
           Alpha: 1
           Show Axes: false
@@ -154,6 +159,8 @@ Visualization Manager:
           Value: true
         base_link:
           Value: true
+        bumper_link:
+          Value: true
         front_bumper_link:
           Value: true
         front_laser:
@@ -216,6 +223,8 @@ Visualization Manager:
           base_link:
             base_footprint:
               {}
+            bumper_link:
+              {}
             front_bumper_link:
               {}
             front_laser:
@@ -268,8 +277,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 2.823516368865967
-        Min Value: -0.008172959089279175
+        Max Value: 2.8239858150482178
+        Min Value: -0.008773714303970337
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -292,6 +301,48 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /robot/visualization_marker
+      Name: MarkerArray
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: true
+      Keep: 100
+      Name: Odometry
+      Position Tolerance: 0.10000000149011612
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 25; 0
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic: /robot/odometry
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -321,16 +372,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 67.9334945678711
+      Distance: 21.608386993408203
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.9954347610473633
-        Y: -1.6097747087478638
-        Z: -4.835235118865967
+        X: 22.38863182067871
+        Y: -20.870561599731445
+        Z: 0.8252226710319519
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

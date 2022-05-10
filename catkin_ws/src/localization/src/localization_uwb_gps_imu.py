@@ -56,8 +56,7 @@ class localization_uwb_gps_imu():
         self.pub_posestamped = rospy.Publisher("posestamped", PoseStamped, queue_size=1)
 
         # Subscriber
-        sub_uwb = message_filters.Subscriber("localization_data_topic_two", PoseStamped)
-        # sub_uwb = message_filters.Subscriber("localization_data_topic_three", PoseStamped)
+        sub_uwb = message_filters.Subscriber("localization_data_topic", PoseStamped)
         sub_imu = message_filters.Subscriber("imu/data", Imu)
         sub_gps = message_filters.Subscriber("navsat/fix", NavSatFix)
         ats = ApproximateTimeSynchronizer((sub_uwb, sub_imu, sub_gps), queue_size = 1, slop = 0.1, allow_headerless = True)
@@ -70,11 +69,12 @@ class localization_uwb_gps_imu():
 
     def cb_gps(self, msg_gps):
         utm_point = fromLatLong(msg_gps.latitude, msg_gps.longitude)
-        self.pose_gps.position.x = utm_point.northing - self.utm_orig.northing
-        self.pose_gps.position.y = -(utm_point.easting - self.utm_orig.easting)
+        self.pose_gps.position.x = -(utm_point.easting - self.utm_orig.easting)
+        self.pose_gps.position.y = -(utm_point.northing - self.utm_orig.northing)
         self.pose_gps.position.z = 0
-        # print("X = ", self.pose_gps.position.x, ", Y = ", self.pose_gps.position.y, ", Z = ", self.pose_gps.position.z)
-        # print("========================================================")
+
+        print("X = ", self.pose_gps.position.x, ", Y = ", self.pose_gps.position.y, ", Z = ", self.pose_gps.position.z)
+        print("========================================================")
 
 
     def cb_imu(self, msg_imu):
@@ -89,6 +89,7 @@ class localization_uwb_gps_imu():
             self.kalman_filter_gps()
         else:
             self.kalman_filter_uwb()
+        # self.kalman_filter_gps()
 
     def kalman_filter_gps(self):
         q = (self.pose_gps.orientation.x, self.pose_gps.orientation.y, self.pose_gps.orientation.z, self.pose_gps.orientation.w)
@@ -256,8 +257,8 @@ class localization_uwb_gps_imu():
         filter_latitude, filter_longitude = self.utmToLatLng(51, east, north)
         x = posterior_x.mean()
         y = posterior_y.mean()
-        # print("latitude = ", filter_latitude, ", longitude = ", filter_longitude)
-        # print("========================================================")
+        print("latitude = ", filter_latitude, ", longitude = ", filter_longitude)
+        print("========================================================")
 
         self.prior_location_x = x
         self.prior_location_y = y

@@ -43,8 +43,11 @@ class waypoint_navigation():
         self.points = queue.Queue(maxsize=20)
         self.reverse = False
         
+        # For square world waypoint navigation
         # self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
-        self.pt_list = [(34.16, -23.5),(14.16, -23.5),(-1.84, -23.5),(-11.84, -23.5),(-12.09, -2.5),(-12.09, 14.5),(-12.09, 2.5)]
+        
+        # For EE6F world waypoint navigation
+        self.pt_list = [(34.16, -23.5),(17.16, -23.5),(-1.84, -23.5),(-11.84, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 26.5),(-30.34, 27.5)]
         self.final_goal = None # The final goal that you want to arrive
         self.goal = self.final_goal
         self.p_list = []
@@ -54,7 +57,7 @@ class waypoint_navigation():
         self.pos_ctrl_min = 0.0
         self.pos_station_max = 0.8
         self.pos_station_min = 0
-        self.station_keeping_dis = 0.5      # meters
+        self.station_keeping_dis = 0.25      # meters
 
 
         if self.reverse :
@@ -107,6 +110,8 @@ class waypoint_navigation():
             self.points.put(self.goal)
             self.goal = self.points.get()
             print ("boat: ", self.goal)
+            if self.goal == (-30.34, 27.5):
+                self.start_station_keeping = True
 
         pose = PoseStamped()
         pose.header = Header()

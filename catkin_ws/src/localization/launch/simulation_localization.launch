@@ -1,8 +1,9 @@
 <launch>
-    <arg name="veh" default="robot"/> 
+    <arg name="veh" default="robot"/>
+    <arg name="uwb" doc="uwb type [two_points, three_points, four_points]"/>
 
     <group ns="$(arg veh)">
-        <node pkg="localization" type="simulation_localization.py" name="simulation_localization" respawn="false" output="screen">
+        <node pkg="localization" type="simulation_localization_$(arg uwb).py" name="simulation_localization" respawn="false" output="screen">
         </node>
     </group>
 

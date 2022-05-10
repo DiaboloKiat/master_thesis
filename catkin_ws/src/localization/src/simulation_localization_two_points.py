@@ -25,16 +25,12 @@ class simulation_localization():
 
         self.all_distance = []
         self.all_destination_id = []
-        self.pose = [0.0, 0.0, 0.0]
         self.two_pose = [0.0, 0.0, 0.0]
-        self.three_pose = [0.0, 0.0, 0.0]
         self.motion_turn = True
 
         #get uwb anchors position
         self.sensor_pos = []
         self.sensor_pos = self.get_anchors_pos()
-
-        
 
         # Subscriber
         # sub_distance = message_filters.Subscriber("uwb_data_distance", uwb_data)
@@ -43,7 +39,7 @@ class simulation_localization():
         # ats.registerCallback(self.cb_sub_data)
         rospy.Subscriber("uwb_data_distance", uwb_data, self.subscribe_data, queue_size=1)
 
-        self.pub_data_two = rospy.Publisher('localization_data_topic_two', PoseStamped, queue_size=10)
+        self.pub_data_two = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
 
     def position_calculation(self): 
         uwb_transient_id = []
@@ -56,83 +52,194 @@ class simulation_localization():
             uwb_range = self.all_distance[i]
 
             if not np.isnan(uwb_range):
-                if i == 4 and self.motion_turn:
-                    # print("On T-Junction now and Turn ")
-                    pass
-                elif i == 8 and self.motion_turn:
-                    # print("On T-Junction now and Turn ")
-                    pass
-                elif i == 2 and self.all_distance[5] < 19000:
-                    pass
-                elif i == 6 and self.all_distance[9] < 21000 and self.all_distance[6] > 11000:
-                    pass
-                elif count > 2 or uwb_range < 21000:
-                    uwb_transient_id.append(uwb_id) 
-                    uwb_transient_distance.append(uwb_range)
-                    sensor_pose_transient.append(self.sensor_pos[i])
+                if count < 2 and uwb_range < 21000:
+                    if i == 0:
+                        if self.all_distance[2] < 20000:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 1:
+                        if self.all_distance[3] < 7000:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 2:
+                        if self.all_distance[4] < 20000 or self.all_distance[5] < 18000:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 3:
+                        if self.all_distance[6] < 20000:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 4:
+                        if self.motion_turn:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 5:
+                        if self.all_distance[7] < 13000:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 6:
+                        if self.all_distance[9] < 21000:
+                            pass
+                        else:
+                            uwb_transient_id.append(uwb_id) 
+                            uwb_transient_distance.append(uwb_range)
+                            sensor_pose_transient.append(self.sensor_pos[i])
+                    
+                            if count == 0:
+                                self.x_1 = self.sensor_pos[i][0] * 1000
+                                self.y_1 = self.sensor_pos[i][1] * 1000
+                            elif count == 1:
+                                self.x_2 = self.sensor_pos[i][0] * 1000
+                                self.y_2 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                    elif i == 7:
+                        uwb_transient_id.append(uwb_id) 
+                        uwb_transient_distance.append(uwb_range)
+                        sensor_pose_transient.append(self.sensor_pos[i])
                 
-                    if count == 0:
-                        self.x_1 = self.sensor_pos[i][0] * 1000
-                        self.y_1 = self.sensor_pos[i][1] * 1000
-                        print(i)
-                    elif count == 1:
-                        self.x_2 = self.sensor_pos[i][0] * 1000
-                        self.y_2 = self.sensor_pos[i][1] * 1000
-                        print(i)
-                    
-                    count += 1
-                    
-        # if count != 2:
-        #     self.two_pose[0] = np.nan
-        #     self.two_pose[1] = np.nan 
-        #     self.two_pose[2] = np.nan 
-        #     self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
-        if sensor_pose_transient[0][0] > sensor_pose_transient[1][0]:
-            x_max = sensor_pose_transient[0][0] * 1000
-            x_min = sensor_pose_transient[1][0] * 1000
-        else:
-            x_max = sensor_pose_transient[1][0] * 1000
-            x_min = sensor_pose_transient[0][0] * 1000
-
-        if sensor_pose_transient[0][1] > sensor_pose_transient[1][1]:
-            y_max = sensor_pose_transient[0][1] * 1000
-            y_min = sensor_pose_transient[1][1] * 1000
-        else:
-            y_max = sensor_pose_transient[1][1] * 1000
-            y_min = sensor_pose_transient[0][1] * 1000
-
-
-        if (x_max - x_min) > (y_max - y_min):
-            a = uwb_transient_distance[0]
-            c = uwb_transient_distance[1]
-
-            a_ = ( (a / (a+c)) * (x_max - x_min) )
-            c_ = ( (c / (a+c)) * (x_max - x_min) )
-            # print(a_, c_)
-
-            if y_max > 0:
-                self.two_pose[1] = y_max - (y_max - y_min)/2
+                        if count == 0:
+                            self.x_1 = self.sensor_pos[i][0] * 1000
+                            self.y_1 = self.sensor_pos[i][1] * 1000
+                        elif count == 1:
+                            self.x_2 = self.sensor_pos[i][0] * 1000
+                            self.y_2 = self.sensor_pos[i][1] * 1000
+                        count += 1
+                    elif i == 8:
+                        pass
+                    else:
+                        uwb_transient_id.append(uwb_id) 
+                        uwb_transient_distance.append(uwb_range)
+                        sensor_pose_transient.append(self.sensor_pos[i])
+                
+                        if count == 0:
+                            self.x_1 = self.sensor_pos[i][0] * 1000
+                            self.y_1 = self.sensor_pos[i][1] * 1000
+                            count += 1
+                        elif count == 1:
+                            self.x_2 = self.sensor_pos[i][0] * 1000
+                            self.y_2 = self.sensor_pos[i][1] * 1000
+                        count += 1
+                        
+    
+        if count == 2:
+            if sensor_pose_transient[0][0] > sensor_pose_transient[1][0]:
+                x_max = sensor_pose_transient[0][0] * 1000
+                x_min = sensor_pose_transient[1][0] * 1000
             else:
-                self.two_pose[1] = (y_max - y_min)/2 + y_min
+                x_max = sensor_pose_transient[1][0] * 1000
+                x_min = sensor_pose_transient[0][0] * 1000
 
-            self.two_pose[0] = x_max - a_
-            self.two_pose[2] = 0.0
-        else:
-            a = uwb_transient_distance[0]
-            c = uwb_transient_distance[1]
-
-            a_ = ( (a / (a+c)) * (y_max - y_min) )
-            c_ = ( (c / (a+c)) * (y_max - y_min) )
-            # print(a_, c_)
-            if x_max > 0:
-                self.two_pose[0] = x_max - (x_max - x_min)/2
+            if sensor_pose_transient[0][1] > sensor_pose_transient[1][1]:
+                y_max = sensor_pose_transient[0][1] * 1000
+                y_min = sensor_pose_transient[1][1] * 1000
             else:
-                self.two_pose[0] = (x_max - x_min)/2 + x_min
+                y_max = sensor_pose_transient[1][1] * 1000
+                y_min = sensor_pose_transient[0][1] * 1000
 
-            self.two_pose[1] = y_max - c_
-            self.two_pose[2] = 0.0     
+            if (x_max - x_min) > (y_max - y_min):
+                a = uwb_transient_distance[0]
+                c = uwb_transient_distance[1]
 
-        self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
+                a_ = ( (a / (a+c)) * (x_max - x_min) )
+                c_ = ( (c / (a+c)) * (x_max - x_min) )
+                # print(a_, c_)
+
+                if y_max > 0:
+                    self.two_pose[1] = y_max - (y_max - y_min)/2
+                else:
+                    self.two_pose[1] = (y_max - y_min)/2 + y_min
+
+                self.two_pose[0] = x_max - a_
+                self.two_pose[2] = 0.0
+            else:
+                a = uwb_transient_distance[0]
+                c = uwb_transient_distance[1]
+
+                a_ = ( (a / (a+c)) * (y_max - y_min) )
+                c_ = ( (c / (a+c)) * (y_max - y_min) )
+                # print(a_, c_)
+                if x_max > 0:
+                    self.two_pose[0] = x_max - (x_max - x_min)/2
+                else:
+                    self.two_pose[0] = (x_max - x_min)/2 + x_min
+
+                self.two_pose[1] = y_max - c_
+                self.two_pose[2] = 0.0     
+
+            self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
+        else:
+            self.two_pose[0] = np.nan
+            self.two_pose[1] = np.nan 
+            self.two_pose[2] = np.nan 
+            self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
+
+        
 
     def publish_data_two(self, pose_x, pose_y, pose_z):
         robot_pos = PoseStamped()

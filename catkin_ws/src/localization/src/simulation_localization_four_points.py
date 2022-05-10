@@ -25,8 +25,7 @@ class simulation_localization():
 
         self.all_distance = []
         self.all_destination_id = []
-        self.pose = [0.0, 0.0, 0.0]
-        self.two_pose = [0.0, 0.0, 0.0]
+        # self.pose = [0.0, 0.0, 0.0]
         self.three_pose = [0.0, 0.0, 0.0]
 
         #get uwb anchors position
@@ -36,8 +35,8 @@ class simulation_localization():
         # Subscriber
         rospy.Subscriber("uwb_data_distance", uwb_data, self.subscribe_data, queue_size=1)
 
-        self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
-        self.pub_data_three = rospy.Publisher('localization_data_topic_three', PoseStamped, queue_size=10)
+        # self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
+        self.pub_data_three = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
 
     def position_calculation(self): 
         for i in range(len(self.all_destination_id)):
@@ -69,16 +68,15 @@ class simulation_localization():
         c_ = (c / (a + c)) * (abs(x_1) + abs(x_3))
         print(a, a_, c, c_, x_1 - x_3)
 
-        self.pose[0] = (b**2 - a**2 + x_max**2 - x_min**2) / (2*(x_max - x_min))
-        self.pose[1] = (c**2 - b**2 + y_max**2 - y_min**2) / (2*(y_max - y_min))
-        self.pose[2] = 0.0
+        # self.pose[0] = (b**2 - a**2 + x_max**2 - x_min**2) / (2*(x_max - x_min))
+        # self.pose[1] = (c**2 - b**2 + y_max**2 - y_min**2) / (2*(y_max - y_min))
+        # self.pose[2] = 0.0
 
         self.three_pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
         self.three_pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
         self.three_pose[2] = 0.0
 
-        self.publish_data(self.pose[0], self.pose[1], self.pose[2])
-        self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
+        # self.publish_data(self.pose[0], self.pose[1], self.pose[2])
         self.publish_data_three(self.three_pose[0], self.three_pose[1], self.three_pose[2])  
 
     def publish_data(self, pose_x, pose_y, pose_z):
