@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /Grid1
-        - /RobotModel1
       Splitter Ratio: 0.5
     Tree Height: 745
   - Class: rviz/Selection
@@ -244,14 +243,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 2.5459580421447754
+        Min Value: -0.007541239261627197
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: AxisColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -263,7 +262,7 @@ Visualization Manager:
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Style: Points
       Topic: /robot/points
       Unreliable: false
       Use Fixed Frame: true
@@ -303,6 +302,14 @@ Visualization Manager:
       Topic: /robot/odometry
       Unreliable: false
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /robot/visualization_marker
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -331,25 +338,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 34.634918212890625
+      Distance: 29.432397842407227
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.7721169590950012
-        Y: 0.3101464807987213
-        Z: -5.183089256286621
+        X: 2.1092190742492676
+        Y: 1.6515120267868042
+        Z: -5.007019996643066
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4147964715957642
+      Pitch: 0.8697969913482666
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.140390634536743
+      Yaw: 3.1553895473480225
     Saved: ~
 Window Geometry:
   Displays:

@@ -28,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -64,6 +64,81 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_bumper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_laser:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        inertial_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rear_bumper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_chassis_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_plate_front_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        top_plate_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_plate_rear_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        user_rail_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: robot/robot_description
       TF Prefix: ""
@@ -75,26 +150,132 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        base_footprint:
+          Value: true
+        base_link:
+          Value: true
+        front_bumper_link:
+          Value: true
+        front_laser:
+          Value: true
+        front_left_wheel_link:
+          Value: true
+        front_right_wheel_link:
+          Value: true
+        imu_link:
+          Value: true
+        inertial_link:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
+        rear_bumper_link:
+          Value: true
+        rear_left_wheel_link:
+          Value: true
+        rear_right_wheel_link:
+          Value: true
+        top_chassis_link:
+          Value: true
+        top_plate_front_link:
+          Value: true
+        top_plate_link:
+          Value: true
+        top_plate_rear_link:
+          Value: true
+        user_rail_link:
+          Value: true
+        uwb_anchor_0:
+          Value: true
+        uwb_anchor_1:
+          Value: true
+        uwb_anchor_2:
+          Value: true
+        uwb_anchor_3:
+          Value: true
+        uwb_anchor_4:
+          Value: true
+        uwb_anchor_5:
+          Value: true
+        uwb_anchor_6:
+          Value: true
+        uwb_anchor_7:
+          Value: true
+        uwb_anchor_8:
+          Value: true
+        uwb_anchor_9:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          base_link:
+            base_footprint:
+              {}
+            front_bumper_link:
+              {}
+            front_laser:
+              {}
+            front_left_wheel_link:
+              {}
+            front_right_wheel_link:
+              {}
+            imu_link:
+              {}
+            inertial_link:
+              {}
+            rear_bumper_link:
+              {}
+            rear_left_wheel_link:
+              {}
+            rear_right_wheel_link:
+              {}
+            top_chassis_link:
+              {}
+            top_plate_link:
+              top_plate_front_link:
+                {}
+              top_plate_rear_link:
+                {}
+            user_rail_link:
+              {}
+          uwb_anchor_0:
+            {}
+          uwb_anchor_1:
+            {}
+          uwb_anchor_2:
+            {}
+          uwb_anchor_3:
+            {}
+          uwb_anchor_4:
+            {}
+          uwb_anchor_5:
+            {}
+          uwb_anchor_6:
+            {}
+          uwb_anchor_7:
+            {}
+          uwb_anchor_8:
+            {}
+          uwb_anchor_9:
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 2.823516368865967
+        Min Value: -0.008172959089279175
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: AxisColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -140,25 +321,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 32.86016845703125
+      Distance: 67.9334945678711
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 27.638259887695312
-        Y: -22.240535736083984
-        Z: 1.8191885948181152
+        X: 0.9954347610473633
+        Y: -1.6097747087478638
+        Z: -4.835235118865967
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.290396809577942
+      Pitch: 1.2753973007202148
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.600388526916504
+      Yaw: 1.5403891801834106
     Saved: ~
 Window Geometry:
   Displays:

@@ -24,10 +24,9 @@ class simulation_localization():
         self.node_name = rospy.get_name()
 
         self.all_distance = []
-        # self.all_distance_ = []
         self.all_destination_id = []
         self.pose = [0.0, 0.0, 0.0]
-        # self.two_pose = [0.0, 0.0, 0.0]
+        self.two_pose = [0.0, 0.0, 0.0]
         self.three_pose = [0.0, 0.0, 0.0]
 
         #get uwb anchors position
@@ -35,21 +34,15 @@ class simulation_localization():
         self.sensor_pos = self.get_anchors_pos()
 
         # Subscriber
-        # sub_distance = message_filters.Subscriber("uwb_data_distance", uwb_data)
-        # sub_distance_ = message_filters.Subscriber("uwb_data_distance_", uwb_data)
-        # ats = ApproximateTimeSynchronizer((sub_distance, sub_distance_), queue_size = 10, slop = 0.1, allow_headerless = True)
-        # ats.registerCallback(self.cb_sub_data)
         rospy.Subscriber("uwb_data_distance", uwb_data, self.subscribe_data, queue_size=1)
 
         self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
-        # self.pub_data_two = rospy.Publisher('localization_data_topic_two', PoseStamped, queue_size=10)
         self.pub_data_three = rospy.Publisher('localization_data_topic_three', PoseStamped, queue_size=10)
 
     def position_calculation(self): 
         for i in range(len(self.all_destination_id)):
             uwb_id = self.all_destination_id[i]
             uwb_range = self.all_distance[i]
-            # uwb_range_ = self.all_distance_[i]
 
             if i == 0:
                 x_max = self.sensor_pos[i][0] * 1000
@@ -57,7 +50,6 @@ class simulation_localization():
                 x_1 = self.sensor_pos[i][0] * 1000
                 y_1 = self.sensor_pos[i][1] * 1000
                 a = uwb_range
-                # a_ = uwb_range_
             elif i == 1:
                 x_2 = self.sensor_pos[i][0] * 1000
                 y_2 = self.sensor_pos[i][1] * 1000
@@ -68,26 +60,25 @@ class simulation_localization():
                 x_3 = self.sensor_pos[i][0] * 1000
                 y_3 = self.sensor_pos[i][1] * 1000
                 c = uwb_range
-                # c_ = uwb_range_
             elif i == 3:
                 x_4 = self.sensor_pos[i][0] * 1000
                 y_4 = self.sensor_pos[i][1] * 1000
                 d = uwb_range
 
+        a_ = (a / (a + c)) * (abs(x_1) + abs(x_3))
+        c_ = (c / (a + c)) * (abs(x_1) + abs(x_3))
+        print(a, a_, c, c_, x_1 - x_3)
+
         self.pose[0] = (b**2 - a**2 + x_max**2 - x_min**2) / (2*(x_max - x_min))
         self.pose[1] = (c**2 - b**2 + y_max**2 - y_min**2) / (2*(y_max - y_min))
         self.pose[2] = 0.0
-
-        # self.two_pose[0] = -((c**2 - a**2 - c_**2 + a_**2) / (4*(x_max - x_min)))
-        # self.two_pose[1] = (3*(c**2) - 3*(a**2) - c_**2 + a_**2 + 2*(x_max**2 - x_min**2 + y_max**2 - y_min**2)) / (4*(y_max - y_min))
-        # self.two_pose[2] = 0.0
 
         self.three_pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
         self.three_pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
         self.three_pose[2] = 0.0
 
         self.publish_data(self.pose[0], self.pose[1], self.pose[2])
-        # self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
+        self.publish_data_two(self.two_pose[0], self.two_pose[1], self.two_pose[2])
         self.publish_data_three(self.three_pose[0], self.three_pose[1], self.three_pose[2])  
 
     def publish_data(self, pose_x, pose_y, pose_z):
@@ -104,21 +95,6 @@ class simulation_localization():
         robot_pos.header.frame_id = "map" 
         # rospy.loginfo(robot_pos)
         self.pub_data.publish(robot_pos)
-
-    # def publish_data_two(self, pose_x, pose_y, pose_z):
-    #     robot_pos = PoseStamped()
-    #     robot_pos.pose.position.x = float(pose_x)
-    #     robot_pos.pose.position.y = float(pose_y)
-    #     robot_pos.pose.position.z = float(pose_z)
-
-    #     robot_pos.pose.orientation.x = 0.0
-    #     robot_pos.pose.orientation.y = 0.0
-    #     robot_pos.pose.orientation.z = 0.0
-    #     robot_pos.pose.orientation.w = 0.0
-    #     robot_pos.header.stamp = rospy.Time.now() 
-    #     robot_pos.header.frame_id = "map" 
-    #     # rospy.loginfo(robot_pos)
-    #     self.pub_data_two.publish(robot_pos)
 
     def publish_data_three(self, pose_x, pose_y, pose_z):
         robot_pos = PoseStamped()
@@ -139,16 +115,6 @@ class simulation_localization():
         self.all_destination_id = uwb_data_cell.destination_id
         self.all_distance = uwb_data_cell.distance
         self.position_calculation()
-    
-    # def subscribe_data_(self, uwb_data_cell):
-    #     self.all_destination_id = uwb_data_cell.destination_id
-    #     self.all_distance_ = uwb_data_cell.distance
-        
-
-    # def cb_sub_data(self, msg_distance, msg_distance_):
-    #     self.subscribe_data(msg_distance)
-    #     self.subscribe_data_(msg_distance_)
-    #     self.position_calculation()
 
     def get_anchors_pos(self):
         max_anchor = 100 

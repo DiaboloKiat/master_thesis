@@ -1,0 +1,31 @@
+<launch>
+    <arg name="veh" default="robot"/> 
+
+    <group ns="$(arg veh)">
+        <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+            <remap from="cloud_in" to="points"/>
+            
+            <rosparam>
+                target_frame: front_laser       <!-- Leave disabled to output scan in pointcloud frame -->
+                transform_tolerance: 0.01
+                min_height: 0.0
+                max_height: 1.0
+
+                angle_min: -1.5708      <!-- -M_PI/2-->
+                angle_max: 1.5708       <!-- M_PI/2-->
+                angle_increment: 0.00437  <!-- M_PI/360.0 (every degrees)-->
+                time_increment: 0.0
+                scan_time: 0.0
+                range_min: 0.10000000149
+                range_max: 20.0
+                use_inf: true
+            </rosparam>
+
+        </node>
+
+
+        <node pkg="navigation" type="waypoint_navigation_obstacle.py" name="waypoint_navigation_obstacle" respawn="false" output="screen">
+        </node>
+    </group>
+
+</launch>

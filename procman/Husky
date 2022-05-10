@@ -24,6 +24,24 @@ group "01_World_EE6F" {
         exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=EE6F";
         host = "localhost";
     }
+    cmd "06_simulation_localization" {
+        exec = "roslaunch localization simulation_localization_two_points.launch veh:=robot";
+        host = "localhost";
+    }
+    cmd "07_localization_uwb_gps_imu" {
+        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot";
+        host = "localhost";
+    }
+    group "08_navigation" {
+        cmd "01_navigation" {
+        exec = "roslaunch navigation waypoint_navigation.launch veh:=robot";
+        host = "localhost";
+        }
+        cmd "RQT_GUI" {
+        exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+        host = "localhost";
+        }
+    }
 }
 
 group "02_World_Square" {

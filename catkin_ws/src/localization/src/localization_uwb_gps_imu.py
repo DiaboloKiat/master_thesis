@@ -56,7 +56,8 @@ class localization_uwb_gps_imu():
         self.pub_posestamped = rospy.Publisher("posestamped", PoseStamped, queue_size=1)
 
         # Subscriber
-        sub_uwb = message_filters.Subscriber("localization_data_topic_three", PoseStamped)
+        sub_uwb = message_filters.Subscriber("localization_data_topic_two", PoseStamped)
+        # sub_uwb = message_filters.Subscriber("localization_data_topic_three", PoseStamped)
         sub_imu = message_filters.Subscriber("imu/data", Imu)
         sub_gps = message_filters.Subscriber("navsat/fix", NavSatFix)
         ats = ApproximateTimeSynchronizer((sub_uwb, sub_imu, sub_gps), queue_size = 1, slop = 0.1, allow_headerless = True)

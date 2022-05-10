@@ -15,6 +15,7 @@ import time
 from geometry_msgs.msg import PoseStamped, Pose, Twist
 from visualization_msgs.msg import Marker, MarkerArray
 from sensor_msgs.msg import Joy
+from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Header
 from std_msgs.msg import Int32
 from nav_msgs.msg import Odometry
@@ -24,8 +25,12 @@ from std_srvs.srv import SetBool, SetBoolResponse
 
 from PID import PID_control
 
+LINEAR_VEL = 0.22
+STOP_DISTANCE = 0.05
+LIDAR_ERROR = 0.05
+SAFE_STOP_DISTANCE = STOP_DISTANCE + LIDAR_ERROR
 
-class waypoint_navigation():
+class waypoint_navigation_obstacle():
     def __init__(self):
         self.node_name = rospy.get_name()
 
@@ -37,24 +42,24 @@ class waypoint_navigation():
         self.robot_pose = [0.0, 0.0]
         self.stop_pose = []
         self.cmd_drive = Twist()
-        self.robot_radius = 0.5
+        self.robot_radius = 0.25
         self.yaw = 0
+        self.lidar_distances = [0.0, 0.0]
 
         self.points = queue.Queue(maxsize=20)
         self.reverse = False
         
-        # self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
-        self.pt_list = [(34.16, -23.5),(14.16, -23.5),(-1.84, -23.5),(-11.84, -23.5),(-12.09, -2.5),(-12.09, 14.5),(-12.09, 2.5)]
+        self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
         self.final_goal = None # The final goal that you want to arrive
         self.goal = self.final_goal
         self.p_list = []
 
         self.dis4constV = 5.0               # Distance for constant velocity
-        self.pos_ctrl_max = 1
+        self.pos_ctrl_max = 5
         self.pos_ctrl_min = 0.0
-        self.pos_station_max = 0.8
+        self.pos_station_max = 2
         self.pos_station_min = 0
-        self.station_keeping_dis = 0.5      # meters
+        self.station_keeping_distance = 0.5      # meters
 
 
         if self.reverse :
@@ -78,6 +83,7 @@ class waypoint_navigation():
         
 
         self.sub_joy = rospy.Subscriber("joy_teleop/joy", Joy, self.cb_joy, queue_size=1)
+        self.sub_scan = rospy.Subscriber("scan", LaserScan, self.get_scan, queue_size=1)
         self.sub = rospy.Subscriber("odometry", Odometry, self.cb_odom, queue_size=1)
 
         self.pos_control = PID_control("Position")
@@ -127,10 +133,18 @@ class waypoint_navigation():
 
         goal_angle = self.get_goal_angle(self.yaw, self.robot_pose, self.goal)
 
-        if goal_distance < self.station_keeping_dis or self.start_station_keeping:
+        min_distance = min(self.lidar_distances)
+        print(min_distance)
+
+        if min_distance < SAFE_STOP_DISTANCE:
+            pos_output = 0.0
+            ang_output = 0.0
+            rospy.loginfo('Stop!')
+        elif goal_distance < self.station_keeping_distance or self.start_station_keeping:
             pos_output, ang_output = self.station_keeping(goal_distance, goal_angle)
         else:
             pos_output, ang_output = self.control(goal_distance, goal_angle)
+            rospy.loginfo('Distance of the obstacle : %f', min_distance)
 
         self.publish_data(pos_output, ang_output)
 
@@ -206,6 +220,47 @@ class waypoint_navigation():
         v1 = np.array(p3) - np.array(p1)
         angle = np.math.atan2(np.linalg.det([v0,v1]),np.dot(v0,v1))
         return np.degrees(angle)
+
+    def get_scan(self, msg):
+        scan_filter = []
+       
+        samples = len(msg.ranges)  # The number of samples is defined in 
+                                    # turtlebot3_<model>.gazebo.xacro file,
+                                    # the default is 360.
+
+        samples_view = 1            # 1 <= samples_view <= samples
+        
+        print samples
+        print 'Value at 0 degrees'
+        print msg.ranges[0]
+        print 'Value at 90 degrees'
+        print msg.ranges[360]
+        print 'Value at 180 degrees'
+        print msg.ranges[718]
+
+        if samples_view > samples:
+            samples_view = samples
+
+        # if samples_view is 1:
+        #     scan_filter.append(mgs.ranges[0])
+
+        else:
+            left_lidar_samples_ranges = -(samples_view//2 + samples_view % 2)
+            right_lidar_samples_ranges = samples_view//2
+            
+            left_lidar_samples = msg.ranges[left_lidar_samples_ranges:]
+            right_lidar_samples = msg.ranges[:right_lidar_samples_ranges]
+            print(left_lidar_samples_ranges, right_lidar_samples_ranges)
+            scan_filter.extend(left_lidar_samples + right_lidar_samples)
+
+        for i in range(samples_view):
+            if scan_filter[i] == float('Inf'):
+                scan_filter[i] = 3.5
+            elif math.isnan(scan_filter[i]):
+                scan_filter[i] = 0
+        
+        print(scan_filter)
+        self.lidar_distances = scan_filter
 
     def angle_range(self, angle): # limit the angle to the range of [-180, 180]
         if angle > 180:
@@ -324,7 +379,7 @@ class waypoint_navigation():
         rospy.loginfo("[%s] Shutdown." %(self.node_name))
 
 if __name__ == '__main__':
-    rospy.init_node('waypoint_navigation_node',anonymous=False)
-    waypoint_navigation_node = waypoint_navigation()
-    rospy.on_shutdown(waypoint_navigation_node.on_shutdown)
+    rospy.init_node('waypoint_navigation_obstacle_node',anonymous=False)
+    waypoint_navigation_obstacle_node = waypoint_navigation_obstacle()
+    rospy.on_shutdown(waypoint_navigation_obstacle_node.on_shutdown)
     rospy.spin()
