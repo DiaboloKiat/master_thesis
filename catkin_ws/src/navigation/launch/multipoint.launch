@@ -1,0 +1,9 @@
+<launch>
+    <arg name="veh" default="robot"/> 
+
+    <group ns="$(arg veh)">
+        <node pkg="navigation" type="multipoint.py" name="multipoint" respawn="false" output="screen">
+        </node>
+    </group>
+
+</launch>

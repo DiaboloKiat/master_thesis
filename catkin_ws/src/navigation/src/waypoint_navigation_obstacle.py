@@ -37,17 +37,18 @@ class waypoint_navigation_obstacle():
         self.robot_pose = [0.0, 0.0]
         self.stop_pose = []
         self.cmd_drive = Twist()
-        self.robot_radius = 0.25
+        self.robot_radius = float(rospy.get_param("~robot_radius", "5.5"))
         self.yaw = 0
+        print(self.robot_radius)
 
         self.points = queue.Queue(maxsize=20)
         self.reverse = False
         
         # For square world waypoint navigation
-        # self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
+        self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
         
         # For EE6F world waypoint navigation
-        self.pt_list = [(34.16, -23.5),(17.16, -23.5),(-1.84, -23.5),(-12.09, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 26.5),(-30.34, 27.5)]
+        # self.pt_list = [(34, -23.5),(17, -23.5),(-2, -23.5),(-12.09, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 27.5),(-30.34, 27.5)]
         self.final_goal = None # The final goal that you want to arrive
         self.goal = self.final_goal
         self.p_list = []
@@ -76,6 +77,7 @@ class waypoint_navigation_obstacle():
         
         self.pub_cmd_vel = rospy.Publisher("joy_teleop/cmd_vel", Twist, queue_size=1)
         self.pub_points = rospy.Publisher("visualization_marker", MarkerArray, queue_size=1)
+        self.pub_goal = rospy.Publisher("/move_base_simple/goal", PoseStamped,queue_size=1)
         self.Markers = MarkerArray()
         self.Markers.markers = []
         
@@ -119,6 +121,7 @@ class waypoint_navigation_obstacle():
         pose.header.frame_id = "map"
         pose.pose.position.x = self.goal[0]
         pose.pose.position.y = self.goal[1]
+        self.publish_goal(self.goal[0], self.goal[1])
         self.pub_points.publish(self.Markers)
 
         if self.auto == 0:
@@ -158,9 +161,9 @@ class waypoint_navigation_obstacle():
                 # move to the left
                 pos_output = 0.0
                 ang_output = -0.3
-            elif self.lidar_distances['front'] < 0.5:
+            elif self.lidar_distances['front'] < 0.3 and self.lidar_distances['fleft'] < 0.3 and self.lidar_distances['fright'] < 0.3:
                 # move backward
-                pos_output = -5.0
+                pos_output = -10.0
                 ang_output = 0.0
             else:
                 pass
@@ -210,6 +213,21 @@ class waypoint_navigation_obstacle():
         self.cmd_drive.angular.z = ang_output
 
         self.pub_cmd_vel.publish(self.cmd_drive)
+
+    def publish_goal(self, pose_x, pose_y):
+        robot_pos = PoseStamped()
+        robot_pos.pose.position.x = float(pose_x)
+        robot_pos.pose.position.y = float(pose_y)
+        robot_pos.pose.position.z = 0.0
+
+        robot_pos.pose.orientation.x = 0.0
+        robot_pos.pose.orientation.y = 0.0
+        robot_pos.pose.orientation.z = 0.0
+        robot_pos.pose.orientation.w = 0.0
+        robot_pos.header.stamp = rospy.Time.now() 
+        robot_pos.header.frame_id = "map" 
+        # rospy.loginfo(robot_pos)
+        self.pub_goal.publish(robot_pos)
 
     def initialize_PID(self):
         self.pos_control.setSampleTime(1)

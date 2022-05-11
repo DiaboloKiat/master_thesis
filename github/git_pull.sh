@@ -103,6 +103,22 @@ else
         return 1
     fi
 
+    BRANCH=master
+    echo "---------------------------------------------------------------------------------------------------"
+    echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< pull subt_rl >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo "---------------------------------------------------------------------------------------------------"
+
+    cd ~/$REPO/catkin_ws/src/ARG/subt_rl
+    git checkout $BRANCH
+    git pull
+    
+    CONFLICTS=$(git ls-files -u | wc -l)
+    if [ "$CONFLICTS" -gt 0 ]
+    then
+        echo "There is conflict in subt_rl. Aborting"
+        return 1
+    fi
+
 
     # ---------- Master_Thesis ---------- #
     BRANCH=master

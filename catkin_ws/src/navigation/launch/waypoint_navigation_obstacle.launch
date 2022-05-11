@@ -1,5 +1,6 @@
 <launch>
     <arg name="veh" default="robot"/> 
+    <arg name="radius" default="0.5"/>
 
     <group ns="$(arg veh)">
         <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
@@ -25,6 +26,7 @@
 
 
         <node pkg="navigation" type="waypoint_navigation_obstacle.py" name="waypoint_navigation_obstacle" respawn="false" output="screen">
+            <param name="robot_radius" value="$(arg radius)" />
         </node>
     </group>
 

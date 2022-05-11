@@ -81,6 +81,16 @@ git add -A
 git commit -m "${message_base} on subt-gazebo"
 git push
 
+BRANCH=devel-kiat
+echo "---------------------------------------------------------------------------------------------------"
+echo "********************************************** push subt_rl ***************************************"
+echo "---------------------------------------------------------------------------------------------------"
+cd ~/$REPO/catkin_ws/src/ARG/subt_rl
+git checkout $BRANCH
+git add -A
+git commit -m "${message_base} on subt_rl"
+git push
+
 
 
 # ---------- Master_Thesis ---------- #

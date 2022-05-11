@@ -25,8 +25,7 @@ class simulation_localization():
 
         self.all_distance = []
         self.all_destination_id = []
-        # self.pose = [0.0, 0.0, 0.0]
-        self.three_pose = [0.0, 0.0, 0.0]
+        self.pose = [0.0, 0.0, 0.0]
 
         #get uwb anchors position
         self.sensor_pos = []
@@ -36,48 +35,157 @@ class simulation_localization():
         rospy.Subscriber("uwb_data_distance", uwb_data, self.subscribe_data, queue_size=1)
 
         # self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
-        self.pub_data_three = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
+        self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
 
-    def position_calculation(self): 
-        for i in range(len(self.all_destination_id)):
-            uwb_id = self.all_destination_id[i]
-            uwb_range = self.all_distance[i]
+    def position_calculation(self):
+        self.uwb_transient_id = []
+        self.uwb_transient_distance = []
+        self.sensor_pose_transient = []
 
-            if i == 0:
-                x_max = self.sensor_pos[i][0] * 1000
-                y_max = self.sensor_pos[i][1] * 1000
-                x_1 = self.sensor_pos[i][0] * 1000
-                y_1 = self.sensor_pos[i][1] * 1000
-                a = uwb_range
-            elif i == 1:
-                x_2 = self.sensor_pos[i][0] * 1000
-                y_2 = self.sensor_pos[i][1] * 1000
-                b = uwb_range
-            elif i == 2:
-                x_min = self.sensor_pos[i][0] * 1000
-                y_min = self.sensor_pos[i][1] * 1000
-                x_3 = self.sensor_pos[i][0] * 1000
-                y_3 = self.sensor_pos[i][1] * 1000
-                c = uwb_range
-            elif i == 3:
-                x_4 = self.sensor_pos[i][0] * 1000
-                y_4 = self.sensor_pos[i][1] * 1000
-                d = uwb_range
+        i = 0
 
-        a_ = (a / (a + c)) * (abs(x_1) + abs(x_3))
-        c_ = (c / (a + c)) * (abs(x_1) + abs(x_3))
-        print(a, a_, c, c_, x_1 - x_3)
+        if not np.isnan(self.all_distance[0]) and not np.isnan(self.all_distance[1]) and \
+                not np.isnan(self.all_distance[2]) and not np.isnan(self.all_distance[3]):
+            x_1 = self.sensor_pos[3][0] * 1000
+            y_1 = self.sensor_pos[3][1] * 1000
+            a = self.all_distance[3]
 
-        # self.pose[0] = (b**2 - a**2 + x_max**2 - x_min**2) / (2*(x_max - x_min))
-        # self.pose[1] = (c**2 - b**2 + y_max**2 - y_min**2) / (2*(y_max - y_min))
-        # self.pose[2] = 0.0
+            x_2 = self.sensor_pos[1][0] * 1000
+            y_2 = self.sensor_pos[1][1] * 1000
+            b = self.all_distance[1]
 
-        self.three_pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
-        self.three_pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
-        self.three_pose[2] = 0.0
+            x_3 = self.sensor_pos[0][0] * 1000
+            y_3 = self.sensor_pos[0][1] * 1000
+            c = self.all_distance[0]
 
-        # self.publish_data(self.pose[0], self.pose[1], self.pose[2])
-        self.publish_data_three(self.three_pose[0], self.three_pose[1], self.three_pose[2])  
+            x_4 = self.sensor_pos[2][0] * 1000
+            y_4 = self.sensor_pos[2][1] * 1000
+            d = self.all_distance[2]
+
+            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+            self.pose[2] = 0.0
+
+        elif not np.isnan(self.all_distance[2]) and not np.isnan(self.all_distance[3]) and  \
+                not np.isnan(self.all_distance[4]) and not np.isnan(self.all_distance[5]):
+            x_1 = self.sensor_pos[5][0] * 1000
+            y_1 = self.sensor_pos[5][1] * 1000
+            a = self.all_distance[5]
+
+            x_2 = self.sensor_pos[3][0] * 1000
+            y_2 = self.sensor_pos[3][1] * 1000
+            b = self.all_distance[3]
+
+            x_3 = self.sensor_pos[2][0] * 1000
+            y_3 = self.sensor_pos[2][1] * 1000
+            c = self.all_distance[2]
+
+            x_4 = self.sensor_pos[4][0] * 1000
+            y_4 = self.sensor_pos[4][1] * 1000
+            d = self.all_distance[4]
+
+            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+            self.pose[2] = 0.0
+        
+        elif not np.isnan(self.all_distance[4]) and not np.isnan(self.all_distance[5]) and  \
+                not np.isnan(self.all_distance[6]):
+            x_1 = self.sensor_pos[6][0] * 1000
+            y_1 = self.sensor_pos[6][1] * 1000
+            a = self.all_distance[6]
+
+            x_2 = self.sensor_pos[5][0] * 1000
+            y_2 = self.sensor_pos[5][1] * 1000
+            b = self.all_distance[5]
+
+            x_3 = self.sensor_pos[4][0] * 1000
+            y_3 = self.sensor_pos[4][1] * 1000
+            c = self.all_distance[4]
+
+            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+            self.pose[2] = 0.0
+
+        elif not np.isnan(self.all_distance[6]) and not np.isnan(self.all_distance[9]) and  \
+                not np.isnan(self.all_distance[10]):
+            x_2 = self.sensor_pos[6][0] * 1000
+            y_2 = self.sensor_pos[6][1] * 1000
+            b = self.all_distance[6]
+
+            x_3 = self.sensor_pos[9][0] * 1000
+            y_3 = self.sensor_pos[9][1] * 1000
+            c = self.all_distance[9]
+
+            x_4 = self.sensor_pos[10][0] * 1000
+            y_4 = self.sensor_pos[10][1] * 1000
+            d = self.all_distance[10]
+
+            self.pose[0] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(y_3 - y_4) ) - ( (y_2 - y_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (x_2 - x_3)*(y_3 - y_4) - (x_3 - x_4)*(y_2- y_3) ) ) )
+            self.pose[1] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(x_3 - x_4) ) - ( (x_2 - x_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (y_2 - y_3)*(x_3 - x_4) - (y_3 - y_4)*(x_2- x_3) ) ) )
+            self.pose[2] = 0.0
+        
+        elif not np.isnan(self.all_distance[9]) and not np.isnan(self.all_distance[10]) and  \
+                not np.isnan(self.all_distance[11]) and not np.isnan(self.all_distance[12]):
+            x_1 = self.sensor_pos[10][0] * 1000
+            y_1 = self.sensor_pos[10][1] * 1000
+            a = self.all_distance[10]
+
+            x_2 = self.sensor_pos[9][0] * 1000
+            y_2 = self.sensor_pos[9][1] * 1000
+            b = self.all_distance[9]
+
+            x_3 = self.sensor_pos[11][0] * 1000
+            y_3 = self.sensor_pos[11][1] * 1000
+            c = self.all_distance[11]
+
+            x_4 = self.sensor_pos[12][0] * 1000
+            y_4 = self.sensor_pos[12][1] * 1000
+            d = self.all_distance[12]
+
+            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+            self.pose[2] = 0.0
+        
+        elif not np.isnan(self.all_distance[11]) and not np.isnan(self.all_distance[12]) and  \
+                not np.isnan(self.all_distance[13]):
+            x_1 = self.sensor_pos[12][0] * 1000
+            y_1 = self.sensor_pos[12][1] * 1000
+            a = self.all_distance[12]
+
+            x_2 = self.sensor_pos[11][0] * 1000
+            y_2 = self.sensor_pos[11][1] * 1000
+            b = self.all_distance[11]
+
+            x_4 = self.sensor_pos[13][0] * 1000
+            y_4 = self.sensor_pos[13][1] * 1000
+            d = self.all_distance[13]
+
+            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_1 - y_4) ) - ( (y_1 - y_2)*(d**2 - a**2 + x_1**2 - x_4**2 + y_1**2 - y_4**2) ) ) / ( 2*( (x_1 - x_2)*(y_1 - y_4) - (x_1 - x_4)*(y_1- y_2) ) ) )
+            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_1 - x_4) ) - ( (x_1 - x_2)*(d**2 - a**2 + x_1**2 - x_4**2 + y_1**2 - y_4**2) ) ) / ( 2*( (y_1 - y_2)*(x_1 - x_4) - (y_1 - y_4)*(x_1- x_2) ) ) )
+            self.pose[2] = 0.0
+
+        elif not np.isnan(self.all_distance[13]) and not np.isnan(self.all_distance[16]) and  \
+                not np.isnan(self.all_distance[17]):
+            x_1 = self.sensor_pos[16][0] * 1000
+            y_1 = self.sensor_pos[16][1] * 1000
+            a = self.all_distance[16]
+
+            x_3 = self.sensor_pos[13][0] * 1000
+            y_3 = self.sensor_pos[13][1] * 1000
+            c = self.all_distance[13]
+
+            x_4 = self.sensor_pos[17][0] * 1000
+            y_4 = self.sensor_pos[17][1] * 1000
+            d = self.all_distance[17]
+
+            self.pose[0] = ( ( ( (c**2 - a**2 + x_1**2 - x_3**2 + y_1**2 - y_3**2)*(y_3 - y_4) ) - ( (y_1 - y_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (x_1 - x_3)*(y_3 - y_4) - (x_3 - x_4)*(y_1- y_3) ) ) )
+            self.pose[1] = ( ( ( (c**2 - a**2 + x_1**2 - x_3**2 + y_1**2 - y_3**2)*(x_3 - x_4) ) - ( (x_1 - x_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (y_1 - y_3)*(x_3 - x_4) - (y_3 - y_4)*(x_1- x_3) ) ) )
+            self.pose[2] = 0.0
+
+        else:
+            pass
+
+        self.publish_data(self.pose[0], self.pose[1], self.pose[2])
 
     def publish_data(self, pose_x, pose_y, pose_z):
         robot_pos = PoseStamped()
@@ -93,21 +201,6 @@ class simulation_localization():
         robot_pos.header.frame_id = "map" 
         # rospy.loginfo(robot_pos)
         self.pub_data.publish(robot_pos)
-
-    def publish_data_three(self, pose_x, pose_y, pose_z):
-        robot_pos = PoseStamped()
-        robot_pos.pose.position.x = float(pose_x)
-        robot_pos.pose.position.y = float(pose_y)
-        robot_pos.pose.position.z = float(pose_z)
-
-        robot_pos.pose.orientation.x = 0.0
-        robot_pos.pose.orientation.y = 0.0
-        robot_pos.pose.orientation.z = 0.0
-        robot_pos.pose.orientation.w = 0.0
-        robot_pos.header.stamp = rospy.Time.now() 
-        robot_pos.header.frame_id = "map" 
-        # rospy.loginfo(robot_pos)
-        self.pub_data_three.publish(robot_pos)
 
     def subscribe_data(self, uwb_data_cell):
         self.all_destination_id = uwb_data_cell.destination_id

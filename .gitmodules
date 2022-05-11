@@ -22,3 +22,7 @@
 	path = catkin_ws/src/ARG/subt-gazebo
 	url = git@github.com:ARG-NCTU/subt-gazebo.git
 	ignore = dirty
+[submodule "catkin_ws/src/ARG/subt_rl"]
+	path = catkin_ws/src/ARG/subt_rl
+	url = git@github.com:ARG-NCTU/subt_rl.git
+	ignore = dirty

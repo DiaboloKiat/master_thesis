@@ -34,8 +34,12 @@ group "01_World_EE6F_two_points" {
     }
     group "08_navigation" {
         cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
+        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot robot_radius:=0.5";
         host = "localhost";
+        }
+        cmd "02_RL_navigation" {
+            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=robot";
+            host = "localhost";
         }
         cmd "RQT_GUI" {
         exec = "rosrun rqt_gui rqt_gui -s reconfigure";
@@ -75,12 +79,16 @@ group "02_World_EE6F_four_points" {
     }
     group "08_navigation" {
         cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
-        host = "localhost";
+            exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot robot_radius:=0.5";
+            host = "localhost";
+        }
+        cmd "02_RL_navigation" {
+            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=robot";
+            host = "localhost";
         }
         cmd "RQT_GUI" {
-        exec = "rosrun rqt_gui rqt_gui -s reconfigure";
-        host = "localhost";
+            exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+            host = "localhost";
         }
     }
 }
@@ -103,7 +111,7 @@ group "03_World_Square" {
         host = "localhost";
     }
     cmd "05_simulation_localization" {
-        exec = "roslaunch localization simulation_localization.launch veh:=robot";
+        exec = "roslaunch localization simulation_localization.launch veh:=robot uwb:=four_points";
         host = "localhost";
     }
     cmd "06_localization_uwb_gps_imu" {
@@ -112,12 +120,12 @@ group "03_World_Square" {
     }
     group "07_navigation" {
         cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
-        host = "localhost";
+            exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
+            host = "localhost";
         }
         cmd "RQT_GUI" {
-        exec = "rosrun rqt_gui rqt_gui -s reconfigure";
-        host = "localhost";
+            exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+            host = "localhost";
         }
     }
 }

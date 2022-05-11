@@ -14,6 +14,8 @@ git checkout main
 cd ~/$REPO/catkin_ws/src/ARG/subt-gazebo
 git checkout devel-kiat
 
+cd ~/$REPO/catkin_ws/src/ARG/subt_rl
+git checkout devel-kiat
 
 # ------------- vrx -------------- #
 
