@@ -25,11 +25,6 @@ from std_srvs.srv import SetBool, SetBoolResponse
 
 from PID import PID_control
 
-LINEAR_VEL = 0.22
-STOP_DISTANCE = 0.05
-LIDAR_ERROR = 0.05
-SAFE_STOP_DISTANCE = STOP_DISTANCE + LIDAR_ERROR
-
 class waypoint_navigation_obstacle():
     def __init__(self):
         self.node_name = rospy.get_name()
@@ -44,12 +39,15 @@ class waypoint_navigation_obstacle():
         self.cmd_drive = Twist()
         self.robot_radius = 0.25
         self.yaw = 0
-        self.lidar_distances = [0.0, 0.0]
 
         self.points = queue.Queue(maxsize=20)
         self.reverse = False
         
-        self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
+        # For square world waypoint navigation
+        # self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
+        
+        # For EE6F world waypoint navigation
+        self.pt_list = [(34.16, -23.5),(17.16, -23.5),(-1.84, -23.5),(-12.09, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 26.5),(-30.34, 27.5)]
         self.final_goal = None # The final goal that you want to arrive
         self.goal = self.final_goal
         self.p_list = []
@@ -113,6 +111,8 @@ class waypoint_navigation_obstacle():
             self.points.put(self.goal)
             self.goal = self.points.get()
             print ("boat: ", self.goal)
+            if self.goal == (-30.34, 27.5):
+                self.start_station_keeping = True
 
         pose = PoseStamped()
         pose.header = Header()
@@ -133,18 +133,38 @@ class waypoint_navigation_obstacle():
 
         goal_angle = self.get_goal_angle(self.yaw, self.robot_pose, self.goal)
 
-        min_distance = min(self.lidar_distances)
-        print(min_distance)
-
-        if min_distance < SAFE_STOP_DISTANCE:
-            pos_output = 0.0
-            ang_output = 0.0
-            rospy.loginfo('Stop!')
-        elif goal_distance < self.station_keeping_distance or self.start_station_keeping:
+        if goal_distance < self.station_keeping_distance or self.start_station_keeping:
             pos_output, ang_output = self.station_keeping(goal_distance, goal_angle)
         else:
             pos_output, ang_output = self.control(goal_distance, goal_angle)
-            rospy.loginfo('Distance of the obstacle : %f', min_distance)
+        
+            if self.lidar_distances['front'] < 1 and self.lidar_distances['fleft'] > 1 and self.lidar_distances['fright'] > 1:
+                # move to the right
+                pos_output = 0.0
+                ang_output = 0.3
+            elif self.lidar_distances['front'] > 1 and self.lidar_distances['fleft'] > 1 and self.lidar_distances['fright'] < 1:
+                # move to the right
+                pos_output = 0.0 
+                ang_output = 0.3
+            elif self.lidar_distances['front'] > 1 and self.lidar_distances['fleft'] < 1 and self.lidar_distances['fright'] > 1:
+                # move to the left
+                pos_output = 0.0
+                ang_output = -0.3
+            elif self.lidar_distances['front'] < 1 and self.lidar_distances['fleft'] > 1 and self.lidar_distances['fright'] < 1:
+                # move to the right
+                pos_output = 0.0 
+                ang_output = 0.3
+            elif self.lidar_distances['front'] < 1 and self.lidar_distances['fleft'] < 1 and self.lidar_distances['fright'] > 1:
+                # move to the left
+                pos_output = 0.0
+                ang_output = -0.3
+            elif self.lidar_distances['front'] < 0.5:
+                # move backward
+                pos_output = -5.0
+                ang_output = 0.0
+            else:
+                pass
+
 
         self.publish_data(pos_output, ang_output)
 
@@ -222,45 +242,27 @@ class waypoint_navigation_obstacle():
         return np.degrees(angle)
 
     def get_scan(self, msg):
-        scan_filter = []
-       
         samples = len(msg.ranges)  # The number of samples is defined in 
                                     # turtlebot3_<model>.gazebo.xacro file,
                                     # the default is 360.
-
-        samples_view = 1            # 1 <= samples_view <= samples
         
-        print samples
-        print 'Value at 0 degrees'
-        print msg.ranges[0]
-        print 'Value at 90 degrees'
-        print msg.ranges[360]
-        print 'Value at 180 degrees'
-        print msg.ranges[718]
+        # print samples
+        # print 'Value at 0 degrees (Right side or Starboard side)'  
+        # print msg.ranges[0]
+        # print 'Value at 90 degrees ()'
+        # print msg.ranges[360]
+        # print 'Value at 180 degrees (Left side or Port side)'
+        # print msg.ranges[718]
 
-        if samples_view > samples:
-            samples_view = samples
+        self.lidar_distances = {
+        'right':  min(min(msg.ranges[0:143]), 10),
+        'fright': min(min(msg.ranges[144:287]), 10),
+        'front':  min(min(msg.ranges[288:431]), 10),
+        'fleft':  min(min(msg.ranges[432:575]), 10),
+        'left':   min(min(msg.ranges[576:718]), 10),
+        }
 
-        # if samples_view is 1:
-        #     scan_filter.append(mgs.ranges[0])
-
-        else:
-            left_lidar_samples_ranges = -(samples_view//2 + samples_view % 2)
-            right_lidar_samples_ranges = samples_view//2
-            
-            left_lidar_samples = msg.ranges[left_lidar_samples_ranges:]
-            right_lidar_samples = msg.ranges[:right_lidar_samples_ranges]
-            print(left_lidar_samples_ranges, right_lidar_samples_ranges)
-            scan_filter.extend(left_lidar_samples + right_lidar_samples)
-
-        for i in range(samples_view):
-            if scan_filter[i] == float('Inf'):
-                scan_filter[i] = 3.5
-            elif math.isnan(scan_filter[i]):
-                scan_filter[i] = 0
-        
-        print(scan_filter)
-        self.lidar_distances = scan_filter
+        # print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
 
     def angle_range(self, angle): # limit the angle to the range of [-180, 180]
         if angle > 180:

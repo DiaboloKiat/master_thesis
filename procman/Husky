@@ -34,7 +34,7 @@ group "01_World_EE6F_two_points" {
     }
     group "08_navigation" {
         cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation.launch veh:=robot";
+        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
         host = "localhost";
         }
         cmd "RQT_GUI" {
@@ -75,7 +75,7 @@ group "02_World_EE6F_four_points" {
     }
     group "08_navigation" {
         cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation.launch veh:=robot";
+        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
         host = "localhost";
         }
         cmd "RQT_GUI" {
@@ -112,7 +112,7 @@ group "03_World_Square" {
     }
     group "07_navigation" {
         cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation.launch veh:=robot";
+        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot";
         host = "localhost";
         }
         cmd "RQT_GUI" {

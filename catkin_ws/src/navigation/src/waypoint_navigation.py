@@ -47,7 +47,7 @@ class waypoint_navigation():
         # self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
         
         # For EE6F world waypoint navigation
-        self.pt_list = [(34.16, -23.5),(17.16, -23.5),(-1.84, -23.5),(-11.84, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 26.5),(-30.34, 27.5)]
+        self.pt_list = [(34.16, -23.5),(17.16, -23.5),(-1.84, -23.5),(-12.09, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 26.5),(-30.34, 27.5)]
         self.final_goal = None # The final goal that you want to arrive
         self.goal = self.final_goal
         self.p_list = []
