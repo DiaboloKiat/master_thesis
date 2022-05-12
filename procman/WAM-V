@@ -1,0 +1,71 @@
+cmd "00_core" {
+    exec = "roscore";
+    host = "localhost";
+}
+
+group "01_WAM-V_World" {
+    group "01_Setup_Environment" {
+        cmd "01_vrx" {
+            exec = "roslaunch vrx_gazebo master_thesis.launch";
+            host = "localhost";
+        }
+        cmd "02_joystick_control" {
+            exec = "roslaunch vrx_gazebo usv_joystick.launch veh:=wamv_1";
+            host = "localhost";
+        }
+        cmd "03_wanv_gazebo_tf" {
+            exec = "roslaunch localization localization_tf.launch veh:=wamv_1 frame_name:=/wamv_1/base_link modelstate_index:=12";
+            host = "localhost";
+        }
+        cmd "04_pozyx_setup" {
+            exec = "roslaunch pozyx_simulation uwb_wamv_anchors_set.launch";
+            host = "localhost";
+        }
+    }
+
+    group "02_pozyx_ranging_localization" {
+        cmd "01_ranging" {
+            exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=wamv_1 world:=wamv modelstate_index:=12";
+            host = "localhost";
+        }
+        cmd "02_simulation_localization" {
+            exec = "roslaunch localization simulation_localization.launch veh:=wamv_1 uwb:=four_points";
+            host = "localhost";
+        }
+        cmd "03_localization_uwb_gps_imu" {
+            exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=wamv_1 utm_zone:=56 imu_name:=sensors/imu/imu/data gps_name:=sensors/gps/gps/fix latitude:=-33.724283 longitude:=150.679633";
+            host = "localhost";
+        }
+    }
+
+    group "03_navigation" {
+        cmd "01_navigation" {
+            exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=wamv_1 robot_radius:=5.5";
+            host = "localhost";
+        }
+        cmd "02_RL_navigation" {
+            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=wamv_1";
+            host = "localhost";
+        }
+        cmd "02_RL_navigation" {
+            exec = "roslaunch navigation mutipoint.launch veh:=wamv_1";
+            host = "localhost";
+        }
+        cmd "RQT_GUI" {
+            exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+            host = "localhost";
+        }
+    }
+}
+
+group "Rviz" {
+    cmd "WAMV World" {
+        exec = "rviz -d rviz/master_thesis.rviz";
+        host = "localhost";
+    }
+}
+
+script "open_wamv" {
+    start cmd "00_core" wait "running";
+    wait ms 2000;
+}

@@ -3,81 +3,60 @@ cmd "00_core" {
     host = "localhost";
 }
 
-group "01_World_EE6F_two_points" {
-    cmd "01_EE6F" {
-    exec = "roslaunch real_to_sim_env gazebo_world.launch world:=EE6F";
-    host = "localhost";
-    }
-    cmd "02_pozyx_setup" {
-        exec = "roslaunch pozyx_simulation uwb_EE6F_anchors_set.launch uwb:=two_points";
-        host = "localhost";
-    }
-    cmd "03_husky" {
-    exec = "roslaunch husky_ros spawn_robot.launch x:=36.5 y:=-23.5 z:=0.13 yaw:=-3.13";
-    host = "localhost";
-    }
-    cmd "04_husky_gazebo_tf" {
-    exec = "roslaunch localization localization_tf.launch veh:=robot";
-    host = "localhost";
-    }
-    cmd "05_pozyx_ranging" {
-        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=EE6F_two_points";
-        host = "localhost";
-    }
-    cmd "06_simulation_localization" {
-        exec = "roslaunch localization simulation_localization.launch veh:=robot uwb:=two_points";
-        host = "localhost";
-    }
-    cmd "07_localization_uwb_gps_imu" {
-        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.5780906777829 longitude:=121.34792783718581";
-        host = "localhost";
-    }
-    group "08_navigation" {
-        cmd "01_navigation" {
-        exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot robot_radius:=0.5";
-        host = "localhost";
-        }
-        cmd "02_RL_navigation" {
-            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=robot";
+group "01_Husky_World" {
+    group "01_Setup_Environment" {
+        cmd "01_EE6F" {
+            exec = "roslaunch real_to_sim_env gazebo_world.launch world:=EE6F";
             host = "localhost";
         }
-        cmd "RQT_GUI" {
-        exec = "rosrun rqt_gui rqt_gui -s reconfigure";
-        host = "localhost";
+        cmd "02_husky" {
+            exec = "roslaunch husky_ros spawn_robot.launch x:=36.5 y:=-23.5 z:=0.13 yaw:=-3.13";
+            host = "localhost";
+        }
+        cmd "03_husky_gazebo_tf" {
+            exec = "roslaunch localization localization_tf.launch veh:=robot";
+            host = "localhost";
+        }
+        group "04_pozyx_setup" {
+            cmd "01_two_points_setup" {
+                exec = "roslaunch pozyx_simulation uwb_EE6F_anchors_set.launch uwb:=two_points";
+                host = "localhost";
+            }
+            cmd "02_four_points_setup" {
+                exec = "roslaunch pozyx_simulation uwb_EE6F_anchors_set.launch uwb:=four_points";
+                host = "localhost";
+            }
         }
     }
-}
 
-group "02_World_EE6F_four_points" {
-    cmd "01_EE6F" {
-    exec = "roslaunch real_to_sim_env gazebo_world.launch world:=EE6F";
-    host = "localhost";
+    group "02_pozyx_ranging_localization" {
+        group "01_two_points" {
+            cmd "01_ranging" {
+                exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=EE6F_two_points";
+                host = "localhost";
+            }
+            cmd "02_simulation_localization" {
+                exec = "roslaunch localization simulation_localization.launch veh:=robot uwb:=two_points";
+                host = "localhost";
+            }
+        }
+        group "02_four_points" {
+            cmd "01_ranging" {
+                exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=EE6F_four_points";
+                host = "localhost";
+            }
+            cmd "02_simulation_localization" {
+                exec = "roslaunch localization simulation_localization.launch veh:=robot uwb:=four_points";
+                host = "localhost";
+            }
+        }
+        cmd "03_localization_uwb_gps_imu" {
+            exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.992788 longitude:=120.632625";
+            host = "localhost";
+        }
     }
-    cmd "02_pozyx_setup" {
-        exec = "roslaunch pozyx_simulation uwb_EE6F_anchors_set.launch uwb:=four_points";
-        host = "localhost";
-    }
-    cmd "03_husky" {
-    exec = "roslaunch husky_ros spawn_robot.launch x:=36.5 y:=-23.5 z:=0.13 yaw:=-3.13";
-    host = "localhost";
-    }
-    cmd "04_husky_gazebo_tf" {
-    exec = "roslaunch localization localization_tf.launch veh:=robot";
-    host = "localhost";
-    }
-    cmd "05_pozyx_ranging" {
-        exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=robot world:=EE6F_four_points";
-        host = "localhost";
-    }
-    cmd "06_simulation_localization" {
-        exec = "roslaunch localization simulation_localization.launch veh:=robot uwb:=four_points";
-        host = "localhost";
-    }
-    cmd "07_localization_uwb_gps_imu" {
-        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.5780906777829 longitude:=121.34792783718581";
-        host = "localhost";
-    }
-    group "08_navigation" {
+
+    group "03_navigation" {
         cmd "01_navigation" {
             exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot robot_radius:=0.5";
             host = "localhost";
@@ -86,17 +65,21 @@ group "02_World_EE6F_four_points" {
             exec = "roslaunch subt_rl goal_rl_tf.launch veh:=robot";
             host = "localhost";
         }
+        cmd "02_RL_navigation" {
+            exec = "roslaunch navigation mutipoint.launch veh:=robot";
+            host = "localhost";
+        }
         cmd "RQT_GUI" {
             exec = "rosrun rqt_gui rqt_gui -s reconfigure";
             host = "localhost";
         }
     }
 }
-
-group "03_World_Square" {
+    
+group "02_World_Square" {
     cmd "01_husky_world" {
-    exec = "roslaunch husky_gazebo husky_world.launch";
-    host = "localhost";
+        exec = "roslaunch husky_gazebo husky_world.launch";
+        host = "localhost";
     }
     cmd "02_pozyx_setup" {
         exec = "roslaunch pozyx_simulation uwb_square_anchors_set.launch";
@@ -115,7 +98,7 @@ group "03_World_Square" {
         host = "localhost";
     }
     cmd "06_localization_uwb_gps_imu" {
-        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.808158737565904 longitude:=120.97138456304958";
+        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.763763 longitude:=121.022556";
         host = "localhost";
     }
     group "07_navigation" {
