@@ -43,9 +43,8 @@ class localization_uwb_gps_imu():
         self.imu_offset = 0
         self.imu_name = rospy.get_param('~imu_name', "imu/data")
         self.gps_name = rospy.get_param('~gps_name', "navsat/fix")
-        self.lat_orig = float(rospy.get_param('~latitude', 0.0))
-        self.long_orig = float(rospy.get_param('~longitude', 0.0))
-        self.utm_zone = rospy.get_param('~utm_zone', 51)
+        self.lat_orig = rospy.get_param('~latitude', 0.0)
+        self.long_orig = rospy.get_param('~longitude', 0.0)
         self.utm_orig = fromLatLong(self.lat_orig, self.long_orig)
         self.imu_rotate = rospy.get_param('~imu_rotate',np.pi/2)
         self.location_x = 0
@@ -72,20 +71,15 @@ class localization_uwb_gps_imu():
 
     def cb_gps(self, msg_gps):
         utm_point = fromLatLong(msg_gps.latitude, msg_gps.longitude)
-        # print(utm_point)
-        # print(self.utm_orig)
-        # print(self.utm_zone)
-        if self.utm_zone == 51:
-            self.pose_gps.position.x = utm_point.easting - self.utm_orig.easting
-            self.pose_gps.position.y = utm_point.northing - self.utm_orig.northing
-            self.pose_gps.position.z = 0
-        elif self.utm_zone == 56:
-            self.pose_gps.position.x = (utm_point.easting - self.utm_orig.easting) * 1000
-            self.pose_gps.position.y = (utm_point.northing - self.utm_orig.northing) * 1000
-            self.pose_gps.position.z = 0
+        print(utm_point)
+        print(self.utm_orig)
+        self.pose_gps.position.x = utm_point.easting - self.utm_orig.easting
+        self.pose_gps.position.y = utm_point.northing - self.utm_orig.northing
+        self.pose_gps.position.z = 0
 
         print("X = ", self.pose_gps.position.x, ", Y = ", self.pose_gps.position.y, ", Z = ", self.pose_gps.position.z)
         print("========================================================")
+
 
     def cb_imu(self, msg_imu):
         self.pose_uwb.orientation = msg_imu.orientation
@@ -167,13 +161,9 @@ class localization_uwb_gps_imu():
         self.odometry.pose.pose.orientation = pose.orientation
 
         #utm to gps
-        if self.utm_zone == 51:
-            east = posterior_x.mean() + self.utm_orig.easting
-            north = posterior_y.mean() + self.utm_orig.northing
-        elif self.utm_zone == 56:
-            east = (posterior_x.mean())/1000 + self.utm_orig.easting
-            north = (posterior_y.mean())/1000 + self.utm_orig.northing
-        filter_latitude, filter_longitude = self.utmToLatLng(self.utm_zone, east, north)
+        east = posterior_x.mean() + self.utm_orig.easting
+        north = posterior_y.mean() + self.utm_orig.northing
+        filter_latitude, filter_longitude = self.utmToLatLng(51, east, north)
         x = posterior_x.mean()
         y = posterior_y.mean()
         print("latitude = ", filter_latitude, ", longitude = ", filter_longitude)
@@ -266,13 +256,9 @@ class localization_uwb_gps_imu():
         self.odometry.pose.pose.orientation = pose.orientation
 
         #utm to gps
-        if self.utm_zone == 51:
-            east = posterior_x.mean() + self.utm_orig.easting
-            north = posterior_y.mean() + self.utm_orig.northing
-        elif self.utm_zone == 56:
-            east = (posterior_x.mean())/1000 + self.utm_orig.easting
-            north = (posterior_y.mean())/1000 + self.utm_orig.northing
-        filter_latitude, filter_longitude = self.utmToLatLng(self.utm_zone, east, north)
+        east = posterior_x.mean() + self.utm_orig.easting
+        north = posterior_y.mean() + self.utm_orig.northing
+        filter_latitude, filter_longitude = self.utmToLatLng(51, east, north)
         x = posterior_x.mean()
         y = posterior_y.mean()
         print("latitude = ", filter_latitude, ", longitude = ", filter_longitude)

@@ -8,6 +8,9 @@
 	<arg name="longitude" default="120.997481"/>
     <arg name="gps_duplicate" default="false"/>
     <arg name="imu_rotate" default='0' />
+    <arg name="imu_name" default="imu/data" />
+    <arg name="gps_name" default="navsat/fix" />
+    <arg name="utm_zone" default='51' />
 
     <group ns="$(arg veh)">
         <node pkg="localization" type="localization_uwb_gps_imu.py" name="localization_uwb_gps_imu" respawn="false" output="screen">
@@ -15,6 +18,9 @@
             <param name="longitude" value="$(arg longitude)"/>
             <param name="imu_rotate" value="$(arg imu_rotate)" />
             <param name="namespace" value="$(arg veh)" />
+            <param name="imu_name" value="$(arg imu_name)" />
+            <param name="gps_name" value="$(arg gps_name)" />
+            <param name="utm_zone" value="$(arg utm_zone)" />
         </node>
     </group>
 

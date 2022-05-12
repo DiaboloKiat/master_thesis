@@ -62,9 +62,47 @@ class simulation_localization():
             y_4 = self.sensor_pos[2][1] * 1000
             d = self.all_distance[2]
 
-            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
-            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
-            self.pose[2] = 0.0
+            if b < a and c < a:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
+            else:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_4) ) - ( (y_1 - y_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_4) - (x_2 - x_4)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_4) ) - ( (x_1 - x_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_4) - (y_2 - y_4)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
+
+        elif not np.isnan(self.all_distance[4]) and not np.isnan(self.all_distance[5]) and  \
+                not np.isnan(self.all_distance[6]) and not np.isnan(self.all_distance[7]):
+            x_1 = self.sensor_pos[4][0] * 1000
+            y_1 = self.sensor_pos[4][1] * 1000
+            a = self.all_distance[4]
+
+            x_2 = self.sensor_pos[5][0] * 1000
+            y_2 = self.sensor_pos[5][1] * 1000
+            b = self.all_distance[5]
+
+            x_3 = self.sensor_pos[6][0] * 1000
+            y_3 = self.sensor_pos[6][1] * 1000
+            c = self.all_distance[6]
+
+            x_4 = self.sensor_pos[7][0] * 1000
+            y_4 = self.sensor_pos[7][1] * 1000
+            d = self.all_distance[7]
+
+            if b < a and c < a:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
+            else:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_4) ) - ( (y_1 - y_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_4) - (x_2 - x_4)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_4) ) - ( (x_1 - x_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_4) - (y_2 - y_4)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
+
+        elif len(self.all_destination_id) <= 18:
+            # print(len(self.all_destination_id))
+            self.pose[0] = np.nan
+            self.pose[1] = np.nan
+            self.pose[2] = np.nan
 
         elif not np.isnan(self.all_distance[2]) and not np.isnan(self.all_distance[3]) and  \
                 not np.isnan(self.all_distance[4]) and not np.isnan(self.all_distance[5]):
@@ -84,9 +122,14 @@ class simulation_localization():
             y_4 = self.sensor_pos[4][1] * 1000
             d = self.all_distance[4]
 
-            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
-            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
-            self.pose[2] = 0.0
+            if b < a and c < a:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
+            else:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_4) ) - ( (y_1 - y_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_4) - (x_2 - x_4)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_4) ) - ( (x_1 - x_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_4) - (y_2 - y_4)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
         
         elif not np.isnan(self.all_distance[4]) and not np.isnan(self.all_distance[5]) and  \
                 not np.isnan(self.all_distance[6]):
@@ -106,24 +149,6 @@ class simulation_localization():
             self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
             self.pose[2] = 0.0
 
-        elif not np.isnan(self.all_distance[6]) and not np.isnan(self.all_distance[9]) and  \
-                not np.isnan(self.all_distance[10]):
-            x_2 = self.sensor_pos[6][0] * 1000
-            y_2 = self.sensor_pos[6][1] * 1000
-            b = self.all_distance[6]
-
-            x_3 = self.sensor_pos[9][0] * 1000
-            y_3 = self.sensor_pos[9][1] * 1000
-            c = self.all_distance[9]
-
-            x_4 = self.sensor_pos[10][0] * 1000
-            y_4 = self.sensor_pos[10][1] * 1000
-            d = self.all_distance[10]
-
-            self.pose[0] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(y_3 - y_4) ) - ( (y_2 - y_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (x_2 - x_3)*(y_3 - y_4) - (x_3 - x_4)*(y_2- y_3) ) ) )
-            self.pose[1] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(x_3 - x_4) ) - ( (x_2 - x_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (y_2 - y_3)*(x_3 - x_4) - (y_3 - y_4)*(x_2- x_3) ) ) )
-            self.pose[2] = 0.0
-        
         elif not np.isnan(self.all_distance[9]) and not np.isnan(self.all_distance[10]) and  \
                 not np.isnan(self.all_distance[11]) and not np.isnan(self.all_distance[12]):
             x_1 = self.sensor_pos[10][0] * 1000
@@ -142,8 +167,31 @@ class simulation_localization():
             y_4 = self.sensor_pos[12][1] * 1000
             d = self.all_distance[12]
 
-            self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
-            self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+            if a < c and b < c:
+                self.pose[0] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(y_2 - y_3) ) - ( (y_1 - y_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (x_1 - x_2)*(y_2 - y_3) - (x_2 - x_3)*(y_1- y_2) ) ) )
+                self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_3) ) - ( (x_1 - x_2)*(c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_3) - (y_2 - y_3)*(x_1- x_2) ) ) )
+                self.pose[2] = 0.0
+            else:
+                self.pose[0] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(y_2 - y_4) ) - ( (y_2 - y_3)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (x_2 - x_3)*(y_2 - y_4) - (x_2 - x_4)*(y_2- y_3) ) ) )
+                self.pose[1] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(x_2 - x_4) ) - ( (x_2 - x_3)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (y_2 - y_3)*(x_2 - x_4) - (y_2 - y_4)*(x_2- x_3) ) ) )
+                self.pose[2] = 0.0
+
+        elif not np.isnan(self.all_distance[6]) and not np.isnan(self.all_distance[9]) and  \
+                not np.isnan(self.all_distance[10]):
+            x_2 = self.sensor_pos[6][0] * 1000
+            y_2 = self.sensor_pos[6][1] * 1000
+            b = self.all_distance[6]
+
+            x_3 = self.sensor_pos[9][0] * 1000
+            y_3 = self.sensor_pos[9][1] * 1000
+            c = self.all_distance[9]
+
+            x_4 = self.sensor_pos[10][0] * 1000
+            y_4 = self.sensor_pos[10][1] * 1000
+            d = self.all_distance[10]
+
+            self.pose[0] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(y_3 - y_4) ) - ( (y_2 - y_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (x_2 - x_3)*(y_3 - y_4) - (x_3 - x_4)*(y_2- y_3) ) ) )
+            self.pose[1] = ( ( ( (c**2 - b**2 + x_2**2 - x_3**2 + y_2**2 - y_3**2)*(x_3 - x_4) ) - ( (x_2 - x_3)*(d**2 - c**2 + x_3**2 - x_4**2 + y_3**2 - y_4**2) ) ) / ( 2*( (y_2 - y_3)*(x_3 - x_4) - (y_3 - y_4)*(x_2- x_3) ) ) )
             self.pose[2] = 0.0
         
         elif not np.isnan(self.all_distance[11]) and not np.isnan(self.all_distance[12]) and  \
@@ -183,7 +231,9 @@ class simulation_localization():
             self.pose[2] = 0.0
 
         else:
-            pass
+            self.pose[0] = np.nan
+            self.pose[1] = np.nan
+            self.pose[2] = np.nan
 
         self.publish_data(self.pose[0], self.pose[1], self.pose[2])
 

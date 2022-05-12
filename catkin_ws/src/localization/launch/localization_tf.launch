@@ -1,10 +1,13 @@
 <launch>
     <arg name="veh" default="robot"/> 
+    <arg name="frame_name" default="base_link"/>
+    <arg name="modelstate_index" default="2"/>
+    
 
     <group ns="$(arg veh)">
         <node pkg="localization" type="localization_tf.py" name="localization_p3d" respawn="false" output="screen">
-            <param name="modelstate_index" value="2" />
-            <param name="frame_name" value="base_link" />
+            <param name="modelstate_index" value="$(arg modelstate_index)" />
+            <param name="frame_name" value="$(arg frame_name)" />
             <param name="parent_name" value="map" />
         </node>
     </group>

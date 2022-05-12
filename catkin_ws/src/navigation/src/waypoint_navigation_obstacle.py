@@ -22,6 +22,8 @@ from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
 from navigation.cfg import pos_PIDConfig, ang_PIDConfig
 from std_srvs.srv import SetBool, SetBoolResponse
+from gazebo_msgs.msg import ContactsState, ModelState
+from gazebo_msgs.srv import SetModelState, GetModelState
 
 from PID import PID_control
 
@@ -30,6 +32,7 @@ class waypoint_navigation_obstacle():
         self.node_name = rospy.get_name()
 
         # initiallize boat status
+        self.collision = 0
         self.auto = 0
         self.start_station_keeping = False
         self.start_navigation = False
@@ -74,6 +77,9 @@ class waypoint_navigation_obstacle():
         self.goal = self.points.get()
         print("---", type(self.points), "---")
         print ("boat: ", self.goal)
+
+        self.reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
+        self.reset_model = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         
         self.pub_cmd_vel = rospy.Publisher("joy_teleop/cmd_vel", Twist, queue_size=1)
         self.pub_points = rospy.Publisher("visualization_marker", MarkerArray, queue_size=1)
@@ -85,6 +91,7 @@ class waypoint_navigation_obstacle():
         self.sub_joy = rospy.Subscriber("joy_teleop/joy", Joy, self.cb_joy, queue_size=1)
         self.sub_scan = rospy.Subscriber("scan", LaserScan, self.get_scan, queue_size=1)
         self.sub = rospy.Subscriber("odometry", Odometry, self.cb_odom, queue_size=1)
+        self.sub_collision = rospy.Subscriber("bumper_states", ContactsState, self.cb_collision, queue_size=1)
 
         self.pos_control = PID_control("Position")
         self.ang_control = PID_control("Angular")
@@ -169,6 +176,13 @@ class waypoint_navigation_obstacle():
                 pass
 
 
+        self.publish_data(pos_output, ang_output)
+
+    def cb_collision(self, msg):
+        self.collision += 1 
+        print(self.collision)
+        pos_output = -10.0
+        ang_output = 0.0
         self.publish_data(pos_output, ang_output)
 
     def control(self, goal_distance, goal_angle):

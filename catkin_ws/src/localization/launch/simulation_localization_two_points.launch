@@ -1,9 +1,0 @@
-<launch>
-    <arg name="veh" default="robot"/> 
-
-    <group ns="$(arg veh)">
-        <node pkg="localization" type="simulation_localization_two_points.py" name="simulation_localization_two_points" respawn="false" output="screen">
-        </node>
-    </group>
-
-</launch>
