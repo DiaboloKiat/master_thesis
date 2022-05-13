@@ -66,7 +66,7 @@ group "01_Husky_World" {
             host = "localhost";
         }
         cmd "02_RL_navigation" {
-            exec = "roslaunch navigation mutipoint.launch veh:=robot";
+            exec = "roslaunch navigation mutipoint.launch veh:=robot world:=husky";
             host = "localhost";
         }
         cmd "RQT_GUI" {

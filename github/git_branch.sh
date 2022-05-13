@@ -17,6 +17,9 @@ git checkout devel-kiat
 cd ~/$REPO/catkin_ws/src/ARG/subt_rl
 git checkout devel-kiat
 
+cd ~/$REPO/catkin_ws/src/ARG/robot_localization
+git checkout melodic-devel
+
 # ------------- vrx -------------- #
 
 source ~/$REPO/catkin_ws/src/vrx/github/git_branch.sh master_thesis

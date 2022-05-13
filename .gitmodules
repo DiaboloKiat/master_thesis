@@ -26,3 +26,7 @@
 	path = catkin_ws/src/ARG/subt_rl
 	url = git@github.com:ARG-NCTU/subt_rl.git
 	ignore = dirty
+[submodule "catkin_ws/src/ARG/robot_localization"]
+	path = catkin_ws/src/ARG/robot_localization
+	url = git@github.com:DiaboloKiat/robot_localization.git
+	ignore = dirty

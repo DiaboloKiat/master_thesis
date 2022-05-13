@@ -1,8 +1,9 @@
 <launch>
-    <arg name="veh" default="robot"/> 
+    <arg name="veh" default="robot"/>
+    <arg name="world" doc="uwb type [wamv, husky]"/>
 
     <group ns="$(arg veh)">
-        <node pkg="navigation" type="multipoint.py" name="multipoint" respawn="false" output="screen">
+        <node pkg="navigation" type="multipoint_$(arg world).py" name="multipoint_$(arg world)" respawn="false" output="screen">
         </node>
     </group>
 

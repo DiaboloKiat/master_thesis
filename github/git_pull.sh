@@ -119,6 +119,22 @@ else
         return 1
     fi
 
+    BRANCH=melodic-devel
+    echo "---------------------------------------------------------------------------------------------------"
+    echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< pull robot_localization >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo "---------------------------------------------------------------------------------------------------"
+
+    cd ~/$REPO/catkin_ws/src/ARG/robot_localization
+    git checkout $BRANCH
+    git pull
+    
+    CONFLICTS=$(git ls-files -u | wc -l)
+    if [ "$CONFLICTS" -gt 0 ]
+    then
+        echo "There is conflict in robot_localization. Aborting"
+        return 1
+    fi
+
 
     # ---------- Master_Thesis ---------- #
     BRANCH=master

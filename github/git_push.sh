@@ -91,7 +91,15 @@ git add -A
 git commit -m "${message_base} on subt_rl"
 git push
 
-
+BRANCH=melodic-devel
+echo "---------------------------------------------------------------------------------------------------"
+echo "**************************************** push robot_localization **********************************"
+echo "---------------------------------------------------------------------------------------------------"
+cd ~/$REPO/catkin_ws/src/ARG/robot_localization
+git checkout $BRANCH
+git add -A
+git commit -m "${message_base} on robot_localization"
+git push
 
 # ---------- Master_Thesis ---------- #
 
