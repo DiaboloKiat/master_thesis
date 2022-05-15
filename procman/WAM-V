@@ -39,21 +39,23 @@ group "01_WAM-V_World" {
     }
 
     group "03_navigation" {
-        cmd "01_navigation" {
-            exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=wamv_1 robot_radius:=5.5";
+        cmd "01_navigation_points" {
+            exec = "roslaunch navigation multipoint_wamv.launch veh:=wamv_1 world:=wamv model:=wamv radius:=1.5";
             host = "localhost";
         }
         cmd "02_RL_navigation" {
-            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=wamv_1";
+            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=wamv_1 cmd:=cmd_vel joy:=joy cloud_in:=sensors/lidars/lidar_wamv/points";
             host = "localhost";
         }
-        cmd "02_RL_navigation" {
-            exec = "roslaunch navigation mutipoint.launch veh:=wamv_1";
-            host = "localhost";
-        }
-        cmd "RQT_GUI" {
-            exec = "rosrun rqt_gui rqt_gui -s reconfigure";
-            host = "localhost";
+        group "03_navigation" {
+            cmd "01_Navigation" {
+                exec = "roslaunch navigation waypoint_navigation_obstacle_wamv.launch veh:=wamv_1 radius:=1.5 lidar_topic:=sensors/lidars/lidar_wamv/points joy:=joy cmd_vel:=cmd_vel";
+                host = "localhost";
+            }
+            cmd "02_RQT_GUI" {
+                exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+                host = "localhost";
+            }
         }
     }
 }

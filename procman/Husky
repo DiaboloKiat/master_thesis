@@ -51,27 +51,29 @@ group "01_Husky_World" {
             }
         }
         cmd "03_localization_uwb_gps_imu" {
-            exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.992788 longitude:=120.632625";
+            exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.785823 longitude:=120.997496 utm_zone:=51";
             host = "localhost";
         }
     }
 
     group "03_navigation" {
-        cmd "01_navigation" {
-            exec = "roslaunch navigation waypoint_navigation_obstacle.launch veh:=robot robot_radius:=0.5";
+        cmd "01_navigation_points" {
+            exec = "roslaunch navigation multipoint_husky.launch veh:=robot world:=husky radius:=1.5";
             host = "localhost";
         }
         cmd "02_RL_navigation" {
-            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=robot";
+            exec = "roslaunch subt_rl goal_rl_tf.launch veh:=robot cloud_in:=/robot/lidar_crop";
             host = "localhost";
         }
-        cmd "02_RL_navigation" {
-            exec = "roslaunch navigation mutipoint.launch veh:=robot world:=husky";
-            host = "localhost";
-        }
-        cmd "RQT_GUI" {
-            exec = "rosrun rqt_gui rqt_gui -s reconfigure";
-            host = "localhost";
+        group "03_navigation" {
+            cmd "01_navigation" {
+                exec = "roslaunch navigation waypoint_navigation_obstacle_husky.launch veh:=robot robot_radius:=1.5";
+                host = "localhost";
+            }
+            cmd "02_RQT_GUI" {
+                exec = "rosrun rqt_gui rqt_gui -s reconfigure";
+                host = "localhost";
+            }
         }
     }
 }
@@ -98,7 +100,7 @@ group "02_World_Square" {
         host = "localhost";
     }
     cmd "06_localization_uwb_gps_imu" {
-        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.763763 longitude:=121.022556";
+        exec = "roslaunch localization localization_uwb_gps_imu.launch veh:=robot latitude:=24.785823 longitude:=120.997496 utm_zone:=51";
         host = "localhost";
     }
     group "07_navigation" {
