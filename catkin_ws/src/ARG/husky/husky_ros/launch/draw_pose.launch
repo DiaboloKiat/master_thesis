@@ -1,0 +1,14 @@
+<launch>
+    <arg name="veh" default="robot"/>
+    <arg name="sub_topic" default="posestamped"/>
+    <arg name="pub_topic" default="route"/>
+
+
+    <group ns="$(arg veh)">
+        <node pkg="husky_ros" type="draw_pose.py" name="draw_pose" respawn="false" output="screen">
+            <param name="sub_topic" value="$(arg sub_topic)" />
+            <param name="pub_topic" value="$(arg pub_topic)" />
+        </node>
+    </group>
+
+</launch>
