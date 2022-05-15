@@ -9,5 +9,5 @@ CMakeLists.txt
 *.mp4
 *.pyc
 *.pyo
-.bag
-.csv
+*.bag
+*.csv
