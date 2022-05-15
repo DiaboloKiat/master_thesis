@@ -11,6 +11,7 @@ import Queue as queue
 import cv2
 import struct
 import time
+import csv
 
 from geometry_msgs.msg import PoseStamped, Pose, Twist
 from visualization_msgs.msg import Marker, MarkerArray
@@ -22,6 +23,7 @@ from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
 from navigation.cfg import pos_PIDConfig, ang_PIDConfig
 from std_srvs.srv import SetBool, SetBoolResponse
+from std_srvs.srv import Empty
 from gazebo_msgs.msg import ContactsState, ModelState
 from gazebo_msgs.srv import SetModelState, GetModelState
 
@@ -32,29 +34,30 @@ class waypoint_navigation_obstacle():
         self.node_name = rospy.get_name()
 
         # initiallize boat status
-        self.collision = 0
         self.auto = 0
+        self.epoch = 0
+        self.count = 0
+        self.iteration = 1
+        self.record = np.zeros([self.iteration])
+        self.record_collision = np.zeros([self.iteration])
+        self.record_time = np.zeros([self.iteration])
+        self.collision = 0
+        self.collision_states = False
         self.start_station_keeping = False
-        self.start_navigation = False
+        self.start_time = 0
+        self.goal = None
+        self.frame = rospy.get_param("~frame", "map")
 
         self.robot_pose = [0.0, 0.0]
-        self.stop_pose = []
+        self.stop = False
         self.cmd_drive = Twist()
-        self.robot_radius = float(rospy.get_param("~robot_radius", "5.5"))
+        self.robot_radius = float(rospy.get_param("~robot_radius", "0.5"))
         self.yaw = 0
-        print(self.robot_radius)
+        self.joy = rospy.get_param("~joy", "joy_teleop/joy")
+        self.cmd_vel = rospy.get_param("~cmd_vel", "joy_teleop/cmd_vel")
+        self.veh = rospy.get_param("~veh", "husky")
+        print("Robot Radius: ", self.robot_radius)
 
-        self.points = queue.Queue(maxsize=20)
-        self.reverse = False
-        
-        # For square world waypoint navigation
-        self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
-        
-        # For EE6F world waypoint navigation
-        # self.pt_list = [(34, -23.5),(17, -23.5),(-2, -23.5),(-12.09, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 27.5),(-30.34, 27.5)]
-        self.final_goal = None # The final goal that you want to arrive
-        self.goal = self.final_goal
-        self.p_list = []
 
         self.dis4constV = 5.0               # Distance for constant velocity
         self.pos_ctrl_max = 5
@@ -62,36 +65,14 @@ class waypoint_navigation_obstacle():
         self.pos_station_max = 2
         self.pos_station_min = 0
         self.station_keeping_distance = 0.5      # meters
-
-
-        if self.reverse :
-            while len(self.pt_list) != 0:
-                self.p_list.append(self.pt_list.pop())
-        else :
-            self.p_list = self.pt_list
-            print(self.p_list)
-
-        for i,point in enumerate(self.p_list):
-            self.points.put(point)
-
-        self.goal = self.points.get()
-        print("---", type(self.points), "---")
-        print ("boat: ", self.goal)
-
-        self.reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
-        self.reset_model = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         
-        self.pub_cmd_vel = rospy.Publisher("joy_teleop/cmd_vel", Twist, queue_size=1)
-        self.pub_points = rospy.Publisher("visualization_marker", MarkerArray, queue_size=1)
-        self.pub_goal = rospy.Publisher("/move_base_simple/goal", PoseStamped,queue_size=1)
-        self.Markers = MarkerArray()
-        self.Markers.markers = []
-        
+        self.pub_cmd_vel = rospy.Publisher(self.cmd_vel, Twist, queue_size=1)
 
-        self.sub_joy = rospy.Subscriber("joy_teleop/joy", Joy, self.cb_joy, queue_size=1)
-        self.sub_scan = rospy.Subscriber("scan", LaserScan, self.get_scan, queue_size=1)
+        self.sub_joy = rospy.Subscriber(self.joy, Joy, self.cb_joy, queue_size=1)
+        self.sub_scan = rospy.Subscriber("RL/scan", LaserScan, self.get_scan, queue_size=1)
         self.sub = rospy.Subscriber("odometry", Odometry, self.cb_odom, queue_size=1)
         self.sub_collision = rospy.Subscriber("bumper_states", ContactsState, self.cb_collision, queue_size=1)
+        self.sub_goal = rospy.Subscriber("/move_base_simple/goal", PoseStamped, self.cb_goal,queue_size=1)
 
         self.pos_control = PID_control("Position")
         self.ang_control = PID_control("Angular")
@@ -107,32 +88,13 @@ class waypoint_navigation_obstacle():
         self.initialize_PID()
 
     def cb_odom(self, msg):
-        self.get_marker()
         self.robot_pose = [msg.pose.pose.position.x, msg.pose.pose.position.y]
-
-        goal_distance = self.get_distance(self.robot_pose, self.goal)
-        
-        if self.final_goal != None:
-            self.goal = self.final_goal
-            self.final_goal = None
-            print ("boat: ", self.goal)
-        elif goal_distance<self.robot_radius and self.start_station_keeping == False:
-            self.points.put(self.goal)
-            self.goal = self.points.get()
-            print ("boat: ", self.goal)
-            if self.goal == (-30.34, 27.5):
-                self.start_station_keeping = True
-
-        pose = PoseStamped()
-        pose.header = Header()
-        pose.header.frame_id = "map"
-        pose.pose.position.x = self.goal[0]
-        pose.pose.position.y = self.goal[1]
-        self.publish_goal(self.goal[0], self.goal[1])
-        self.pub_points.publish(self.Markers)
+        # print(self.robot_pose)
 
         if self.auto == 0:
             return
+
+        goal_distance = self.get_distance(self.robot_pose, self.goal)
 
         quaternion = (msg.pose.pose.orientation.x,\
                         msg.pose.pose.orientation.y,\
@@ -148,41 +110,29 @@ class waypoint_navigation_obstacle():
         else:
             pos_output, ang_output = self.control(goal_distance, goal_angle)
         
-            if self.lidar_distances['front'] < 1 and self.lidar_distances['fleft'] > 1 and self.lidar_distances['fright'] > 1:
-                # move to the right
-                pos_output = 0.0
-                ang_output = 0.3
-            elif self.lidar_distances['front'] > 1 and self.lidar_distances['fleft'] > 1 and self.lidar_distances['fright'] < 1:
-                # move to the right
-                pos_output = 0.0 
-                ang_output = 0.3
-            elif self.lidar_distances['front'] > 1 and self.lidar_distances['fleft'] < 1 and self.lidar_distances['fright'] > 1:
-                # move to the left
-                pos_output = 0.0
-                ang_output = -0.3
-            elif self.lidar_distances['front'] < 1 and self.lidar_distances['fleft'] > 1 and self.lidar_distances['fright'] < 1:
-                # move to the right
-                pos_output = 0.0 
-                ang_output = 0.3
-            elif self.lidar_distances['front'] < 1 and self.lidar_distances['fleft'] < 1 and self.lidar_distances['fright'] > 1:
-                # move to the left
-                pos_output = 0.0
-                ang_output = -0.3
-            elif self.lidar_distances['front'] < 0.3 and self.lidar_distances['fleft'] < 0.3 and self.lidar_distances['fright'] < 0.3:
-                # move backward
-                pos_output = -10.0
-                ang_output = 0.0
-            else:
-                pass
+            # if self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] > 3:
+            #     # move to the right
+            #     pos_output = -0.5
+            #     ang_output = -0.3
+            # elif self.lidar_distances['front'] > 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] < 3:
+            #     # move to the right
+            #     pos_output = -0.5 
+            #     ang_output = -0.3
+            # elif self.lidar_distances['front'] > 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
+            #     # move to the left
+            #     pos_output = -0.5
+            #     ang_output = 0.3
+            # elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] < 3:
+            #     # move to the right
+            #     pos_output = -0.5 
+            #     ang_output = -0.3
+            # elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
+            #     # move to the left
+            #     pos_output = -0.5
+            #     ang_output = 0.3
+            # else:
+            #     pass
 
-
-        self.publish_data(pos_output, ang_output)
-
-    def cb_collision(self, msg):
-        self.collision += 1 
-        print(self.collision)
-        pos_output = -10.0
-        ang_output = 0.0
         self.publish_data(pos_output, ang_output)
 
     def control(self, goal_distance, goal_angle):
@@ -228,20 +178,15 @@ class waypoint_navigation_obstacle():
 
         self.pub_cmd_vel.publish(self.cmd_drive)
 
-    def publish_goal(self, pose_x, pose_y):
-        robot_pos = PoseStamped()
-        robot_pos.pose.position.x = float(pose_x)
-        robot_pos.pose.position.y = float(pose_y)
-        robot_pos.pose.position.z = 0.0
+    def cb_goal(self, msg):
+        # print(msg)
+        if msg.header.frame_id != self.frame:
+            self.goal = None
+            print(self.goal)
+            return
 
-        robot_pos.pose.orientation.x = 0.0
-        robot_pos.pose.orientation.y = 0.0
-        robot_pos.pose.orientation.z = 0.0
-        robot_pos.pose.orientation.w = 0.0
-        robot_pos.header.stamp = rospy.Time.now() 
-        robot_pos.header.frame_id = "map" 
-        # rospy.loginfo(robot_pos)
-        self.pub_goal.publish(robot_pos)
+        self.goal = np.array([msg.pose.position.x, msg.pose.position.y])
+        # print(self.goal)
 
     def initialize_PID(self):
         self.pos_control.setSampleTime(1)
@@ -253,6 +198,24 @@ class waypoint_navigation_obstacle():
         self.ang_control.SetPoint = 0.0
         self.pos_station_control.SetPoint = 0.0
         self.ang_station_control.SetPoint = 0.0
+
+    def cb_collision(self, msg):
+        if self.collision_states == True:
+            if msg.states == [] and self.count > 1000:
+                self.collision_states = False
+                # print(self.collision_states)
+            else:
+                self.count += 1
+                # print(self.count)
+        elif msg.states != [] and self.count == 0:
+            pos_output = -1.0
+            ang_output = 0.0
+            self.publish_data(pos_output, ang_output)
+            time.sleep(10)
+        else:
+            self.collision_states = False
+            self.count = 0
+        
 
     def get_distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
@@ -294,7 +257,7 @@ class waypoint_navigation_obstacle():
         'left':   min(min(msg.ranges[576:718]), 10),
         }
 
-        # print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
+        print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
 
     def angle_range(self, angle): # limit the angle to the range of [-180, 180]
         if angle > 180:
@@ -381,33 +344,11 @@ class waypoint_navigation_obstacle():
         if (msg.buttons[Y] == 1) and not self.start_station_keeping:
             self.final_goal = self.goal
             self.start_station_keeping = True
-            rospy.loginfo('start_station_keeping')
+            rospy.loginfo('start station keeping')
         elif msg.buttons[X] == 1 and self.start_station_keeping:
             self.final_goal = None
             self.start_station_keeping = False
-            rospy.loginfo('start_navigation')
-
-    def get_marker(self):
-        i = 1
-        for pt in self.pt_list:
-            self.marker = Marker()
-            self.marker.header.stamp = rospy.Time.now()
-            self.marker.header.frame_id = 'map'
-            self.marker.type = self.marker.SPHERE
-            self.marker.action = self.marker.ADD
-            self.marker.pose.orientation.w = 1
-            self.marker.pose.position.x = pt[0]
-            self.marker.pose.position.y = pt[1]
-            self.marker.id = i
-            i = i+1
-            self.marker.scale.x = 0.25
-            self.marker.scale.y = 0.25
-            self.marker.scale.z = 0.25
-            self.marker.color.a = 1.0
-            self.marker.color.r = 0
-            self.marker.color.g = 0
-            self.marker.color.b = 1
-            self.Markers.markers.append(self.marker)
+            rospy.loginfo('start navigation')
 
     def on_shutdown(self):
         rospy.loginfo("[%s] Shutdown." %(self.node_name))

@@ -98,8 +98,8 @@ class simulation_localization():
                 self.pose[1] = ( ( ( (b**2 - a**2 + x_1**2 - x_2**2 + y_1**2 - y_2**2)*(x_2 - x_4) ) - ( (x_1 - x_2)*(d**2 - b**2 + x_2**2 - x_4**2 + y_2**2 - y_4**2) ) ) / ( 2*( (y_1 - y_2)*(x_2 - x_4) - (y_2 - y_4)*(x_1- x_2) ) ) )
                 self.pose[2] = 0.0
 
-        elif len(self.all_destination_id) <= 18:
-            # print(len(self.all_destination_id))
+        elif len(self.all_destination_id) < 18:
+            print(len(self.all_destination_id))
             self.pose[0] = np.nan
             self.pose[1] = np.nan
             self.pose[2] = np.nan

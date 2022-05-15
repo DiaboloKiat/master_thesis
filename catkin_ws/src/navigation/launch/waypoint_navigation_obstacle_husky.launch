@@ -1,16 +1,20 @@
 <launch>
     <arg name="veh" default="robot"/> 
     <arg name="radius" default="0.5"/>
+    <arg name="lidar_topic" default="points"/>
+    <arg name="joy" default="joy_teleop/joy"/>
+    <arg name="cmd_vel" default="joy_teleop/cmd_vel"/>
 
     <group ns="$(arg veh)">
         <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
-            <remap from="cloud_in" to="points"/>
+            <remap from="cloud_in" to="$(arg lidar_topic)"/>
+            <remap from="scan" to="RL/scan" />
             
             <rosparam>
                 target_frame: front_laser       <!-- Leave disabled to output scan in pointcloud frame -->
                 transform_tolerance: 0.01
-                min_height: 0.0
-                max_height: 1.0
+                min_height: -0.3
+                max_height: 0.5
 
                 angle_min: -1.5708      <!-- -M_PI/2-->
                 angle_max: 1.5708       <!-- M_PI/2-->
@@ -21,12 +25,13 @@
                 range_max: 20.0
                 use_inf: true
             </rosparam>
-
         </node>
 
-
-        <node pkg="navigation" type="waypoint_navigation_obstacle.py" name="waypoint_navigation_obstacle" respawn="false" output="screen">
+        <node pkg="navigation" type="waypoint_navigation_obstacle_husky.py" name="waypoint_navigation_obstacle" respawn="false" output="screen">
             <param name="robot_radius" value="$(arg radius)" />
+            <param name="joy" value="$(arg joy)" />
+            <param name="cmd_vel" value="$(arg cmd_vel)" />
+            <param name="veh" value="$(arg veh)" />
         </node>
     </group>
 

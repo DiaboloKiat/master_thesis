@@ -11,17 +11,24 @@ import Queue as queue
 import cv2
 import struct
 import time
+import sys
+import pickle as pkl
+import csv
+
 
 from geometry_msgs.msg import PoseStamped, Pose, Twist
 from visualization_msgs.msg import Marker, MarkerArray
 from sensor_msgs.msg import Joy
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Header
+from std_srvs.srv import Empty
 from std_msgs.msg import Int32
 from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
 from navigation.cfg import pos_PIDConfig, ang_PIDConfig
 from std_srvs.srv import SetBool, SetBoolResponse
+from gazebo_msgs.msg import ContactsState, ModelState
+from gazebo_msgs.srv import SetModelState, GetModelState
 
 class multipoint():
     def __init__(self):
@@ -29,49 +36,46 @@ class multipoint():
 
         # initiallize boat status
         self.auto = 0
-        self.start_station_keeping = False
-        self.start_navigation = False
+        self.epoch = 0
+        self.count = 0
+        self.iteration = 10
+        self.record = np.zeros([self.iteration])
+        self.record_collision = np.zeros([self.iteration])
+        self.record_time = np.zeros([self.iteration])
+        self.collision = 0
+        self.collision_states = False
+        self.start_time = 0
 
         self.robot_pose = [0.0, 0.0]
-        self.stop_pose = []
+        self.stop = False
         self.cmd_drive = Twist()
-        self.robot_radius = float(rospy.get_param("~robot_radius", "5.5"))
+        self.robot_radius = float(rospy.get_param("~robot_radius", "0.5"))
         self.yaw = 0
-        print(self.robot_radius)
-
-        self.points = queue.Queue(maxsize=20)
-        self.reverse = False
-        
-        # For square world waypoint navigation
-        # self.pt_list = [(2.5, 2.5),(2.5, -2.5),(-2.5, -2.5),(-2.5, 2.5)]
+        self.model = rospy.get_param("~model", "robot")
+        print("Robot Radius: ", self.robot_radius)
         
         # For EE6F world waypoint navigation
-        self.pt_list = [(34, -23.5),(17, -23.5),(-2, -23.5),(-12.09, -23.5),(-12.09, -6.5),(-12.09, 14.5),(-12.09, 27.5),(-30.34, 27.5)]
-        self.final_goal = None # The final goal that you want to arrive
-        self.goal = self.final_goal
-        self.p_list = []
+        # (EE632, EE622, EE623, elevator, EE616, EE613, EE605)
+        self.pt_list = [(21, -23.5, -3.13),(12, -23.5, -3.13),(-6, -23.5, -3.13),(-12, -18.5, 1.57),(-12, 6.5, 1.57),(-14, 27.5, -3.13),(-30.5, 27.5, -3.13)]
+        
+        self.final_goal = (-30.5, 27.5, -3.13) # The final goal that you want to arrive
+        self.goal = None
+        # self.p_list = []
 
-        self.dis4constV = 5.0               # Distance for constant velocity
-        self.pos_ctrl_max = 5
-        self.pos_ctrl_min = 0.0
-        self.pos_station_max = 2
-        self.pos_station_min = 0
-        self.station_keeping_distance = 0.5      # meters
+        # self.p_list = self.pt_list
+        # print(self.p_list)
 
+        # for i,point in enumerate(self.p_list):
+        #     self.points.put(point)
 
-        if self.reverse :
-            while len(self.pt_list) != 0:
-                self.p_list.append(self.pt_list.pop())
-        else :
-            self.p_list = self.pt_list
-            print(self.p_list)
+        # self.goal = self.points.get()
+        # print("---", type(self.points), "---")
+        # print ("boat: ", self.goal)
 
-        for i,point in enumerate(self.p_list):
-            self.points.put(point)
+        
 
-        self.goal = self.points.get()
-        print("---", type(self.points), "---")
-        print ("boat: ", self.goal)
+        self.reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
+        self.reset_model = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
         
         self.pub_points = rospy.Publisher("visualization_marker", MarkerArray, queue_size=1)
         self.pub_goal = rospy.Publisher("/move_base_simple/goal", PoseStamped,queue_size=1)
@@ -79,6 +83,11 @@ class multipoint():
         self.Markers.markers = []
         
         self.sub = rospy.Subscriber("odometry", Odometry, self.cb_odom, queue_size=1)
+        self.sub_collision = rospy.Subscriber("bumper_states", ContactsState, self.cb_collision, queue_size=1)
+
+        self.initial_state()
+
+        
 
     def cb_odom(self, msg):
         self.get_marker()
@@ -86,43 +95,117 @@ class multipoint():
 
         goal_distance = self.get_distance(self.robot_pose, self.goal)
         
-        if self.final_goal != None:
-            self.goal = self.final_goal
-            self.final_goal = None
-            print ("boat: ", self.goal)
-        elif goal_distance<self.robot_radius and self.start_station_keeping == False:
+        if self.final_goal == self.goal and goal_distance < self.robot_radius and self.stop == False:
+            self.record[self.epoch] = 1
+            self.record_collision[self.epoch] = str(self.collision)
+            time = rospy.Time.now()
+            print((time - self.start_time)/1000000000)
+            self.record_time[self.epoch] = str((time - self.start_time)/1000000000)
+            print (self.epoch, self.record[self.epoch], self.record_collision[self.epoch])
+            self.epoch += 1
+            self.initial_state()
+            self.start_time = rospy.Time.now()
+            print(self.start_time)
+        elif goal_distance < self.robot_radius and self.stop == False:
             self.points.put(self.goal)
             self.goal = self.points.get()
             print ("boat: ", self.goal)
-            if self.goal == (-30.34, 27.5):
-                self.start_station_keeping = True
 
+        if self.epoch == self.iteration and self.stop == False:
+            folder = '/home/kiat_thesis/master_thesis/bag'
+            record_name = 'uwb_navigation.csv'
+            fileObject = open(folder + "/" + record_name, 'w')
+            writer = csv.writer(fileObject)
+            writer.writerow(self.record)
+            writer.writerow(self.record_collision)
+            writer.writerow(self.record_time)
+            fileObject.close()
+            self.stop = True
+
+        if self.start_time == 0:
+            self.start_time = rospy.Time.now()
+            print(self.start_time)
+  
         pose = PoseStamped()
         pose.header = Header()
         pose.header.frame_id = "map"
         pose.pose.position.x = self.goal[0]
         pose.pose.position.y = self.goal[1]
-        self.publish_goal(self.goal[0], self.goal[1])
+        self.publish_goal(self.goal[0], self.goal[1], self.goal[2])
         self.pub_points.publish(self.Markers)
 
+    def cb_collision(self, msg):
+        if self.collision_states == True:
+            if msg.states == [] and self.count > 1000:
+                self.collision_states = False
+                # print(self.collision_states)
+            else:
+                self.count += 1
+                # print(self.count)
+        elif msg.states != [] and self.count == 0:
+            self.collision_states = True
+            self.collision += 1
+            print(self.collision)
+            print(self.collision_states)
+        else:
+            self.collision_states = False
+            self.count = 0
 
-    def publish_goal(self, pose_x, pose_y):
-        robot_pos = PoseStamped()
-        robot_pos.pose.position.x = float(pose_x)
-        robot_pos.pose.position.y = float(pose_y)
-        robot_pos.pose.position.z = 0.0
 
-        robot_pos.pose.orientation.x = 0.0
-        robot_pos.pose.orientation.y = 0.0
-        robot_pos.pose.orientation.z = 0.0
-        robot_pos.pose.orientation.w = 0.0
-        robot_pos.header.stamp = rospy.Time.now() 
-        robot_pos.header.frame_id = "map" 
-        # rospy.loginfo(robot_pos)
-        self.pub_goal.publish(robot_pos)
+    def publish_goal(self, pose_x, pose_y, yaw):
+        quat = tf.transformations.quaternion_from_euler(0, 0, yaw)
+
+        goal_pos = PoseStamped()
+        goal_pos.pose.position.x = float(pose_x)
+        goal_pos.pose.position.y = float(pose_y)
+        goal_pos.pose.position.z = 0.0
+
+        goal_pos.pose.orientation.x = quat[0]
+        goal_pos.pose.orientation.y = quat[1]
+        goal_pos.pose.orientation.z = quat[2]
+        goal_pos.pose.orientation.w = quat[3]
+        goal_pos.header.stamp = rospy.Time.now() 
+        goal_pos.header.frame_id = "map" 
+        # rospy.loginfo(goal_pos)
+        self.pub_goal.publish(goal_pos)
 
     def get_distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+
+    def initial_state(self):
+        # start position
+        yaw = -3.13
+        self.state_msg = ModelState()
+        self.state_msg.model_name = self.model
+        
+        quat = tf.transformations.quaternion_from_euler(0, 0, yaw)
+
+        self.state_msg.pose.orientation.x = quat[0]
+        self.state_msg.pose.orientation.y = quat[1]
+        self.state_msg.pose.orientation.z = quat[2]
+        self.state_msg.pose.orientation.w = quat[3]
+
+        self.state_msg.pose.position.x = 36.5
+        self.state_msg.pose.position.y = -23.5
+        self.state_msg.pose.position.z = 0.13
+
+        if self.stop == False:
+            # initial goal pose
+            self.points = queue.Queue(maxsize=20)
+            self.p_list = []
+            self.p_list = self.pt_list
+            print(self.p_list)
+
+            for i,point in enumerate(self.p_list):
+                self.points.put(point)
+
+            self.goal = self.points.get()
+            print("---", type(self.points), "---")
+            print ("boat: ", self.goal)
+
+            self.collision = 0
+
+            self.reset_model(self.state_msg)
 
     def get_marker(self):
         i = 1

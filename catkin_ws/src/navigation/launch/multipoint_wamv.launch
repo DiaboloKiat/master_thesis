@@ -1,0 +1,24 @@
+<launch>
+    <arg name="veh" default="robot"/>
+    <arg name="world" default="wamv"/>
+    <arg name="radius" default="1.5"/>
+    <arg name="model" default="wamv"/>
+
+    <group ns="$(arg veh)">
+        <node pkg="navigation" type="multipoint_$(arg world).py" name="multipoint" respawn="false" output="screen">
+            <param name="robot_radius" value="$(arg radius)" />
+            <param name="model" value="$(arg model)" />
+        </node>
+
+
+        <node pkg="husky_ros" type="lidar_crop_wamv" name="lidar_crop_wamv" output="screen">
+            <param name="~x_max" value="1.2" />
+            <param name="~y_max" value="1.25" />
+            <param name="~z_max" value="1.5" />
+            <param name="~x_min" value="-4" />
+            <param name="~y_min" value="-1.25" />
+            <param name="~z_min" value="-1" />
+        </node>
+    </group>
+
+</launch>

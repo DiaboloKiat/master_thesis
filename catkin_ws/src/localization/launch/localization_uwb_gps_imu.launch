@@ -21,6 +21,7 @@
             <param name="imu_name" value="$(arg imu_name)" />
             <param name="gps_name" value="$(arg gps_name)" />
             <param name="utm_zone" value="$(arg utm_zone)" />
+            <param name="veh" value="$(arg veh)" />
         </node>
     </group>
 
