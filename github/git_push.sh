@@ -109,7 +109,7 @@ echo "--------------------------------------------------------------------------
 cd ~/$REPO
 git add -A
 git commit -m "${message_base} on master_thesis"
-git push
+git push origin master
 
 
 cd ~/$REPO
