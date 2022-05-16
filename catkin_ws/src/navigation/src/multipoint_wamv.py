@@ -60,7 +60,7 @@ class multipoint():
         self.docker_1 = [(-533, 218, 3.14),(-543, 218, 3.14),(-553, 218, 3.14)]
         self.docker_2 = [(-533, 224, 3.14),(-543, 224, 3.14),(-553, 224, 3.14)]
         self.docker_3 = [(-533, 230, 3.14),(-543, 230, 3.14),(-553, 230, 3.14)]
-        self.pt_list = [(-500, 224, 3.14),(-553, 218, 3.14),(-553, 224, 3.14),(-553, 230, 3.14)]
+        self.pt_list = [(-510, 224, 3.14),(-553, 218, 3.14),(-553, 224, 3.14),(-553, 230, 3.14)]
 
         self.final_goal = None # The final goal that you want to arrive
         self.goal = None
@@ -197,8 +197,8 @@ class multipoint():
         self.state_msg.pose.orientation.z = quat[2]
         self.state_msg.pose.orientation.w = quat[3]
 
-        self.state_msg.pose.position.x = random.uniform(-520, -500) #-532
-        self.state_msg.pose.position.y = random.uniform(170, 240) #162
+        self.state_msg.pose.position.x = random.uniform(-450, -500) #-532
+        self.state_msg.pose.position.y = random.uniform(200, 250) #162
         self.state_msg.pose.position.z = 0.1
 
         if self.stop == False:
