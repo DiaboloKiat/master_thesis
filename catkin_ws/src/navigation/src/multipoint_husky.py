@@ -56,7 +56,7 @@ class multipoint():
         
         # For EE6F world waypoint navigation
         # (EE632, EE622, EE623, elevator, EE616, EE613, EE605)
-        self.pt_list = [(21, -23.5, -3.13),(12, -23.5, -3.13),(-6, -23.5, -3.13),(-12, -18.5, 1.57),(-12, 6.5, 1.57),(-14, 27.5, -3.13),(-30.5, 27.5, -3.13)]
+        self.pt_list = [(21, -23.5, -3.13),(12, -23.5, -3.13),(-6, -23.5, -3.13),(-12, -18.5, 1.57),(-12, 6.5, 1.57),(-20, 27.5, -3.13),(-30.5, 27.5, -3.13)]
         
         self.final_goal = (-30.5, 27.5, -3.13) # The final goal that you want to arrive
         self.goal = None
@@ -72,7 +72,10 @@ class multipoint():
         # print("---", type(self.points), "---")
         # print ("boat: ", self.goal)
 
-        
+        if self.start_time == 0:
+            time.sleep(2.0)
+            self.start_time = rospy.Time.now()
+            print(self.start_time)
 
         self.reset_world = rospy.ServiceProxy('/gazebo/reset_world', Empty)
         self.reset_model = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
@@ -122,10 +125,6 @@ class multipoint():
             fileObject.close()
             self.stop = True
 
-        if self.start_time == 0:
-            self.start_time = rospy.Time.now()
-            print(self.start_time)
-  
         pose = PoseStamped()
         pose.header = Header()
         pose.header.frame_id = "map"

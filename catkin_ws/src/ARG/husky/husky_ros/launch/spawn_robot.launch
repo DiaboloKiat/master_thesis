@@ -11,7 +11,7 @@
   <arg name="yaw" default="2"/>
 
   <!-- Optionally disable teleop control -->
-  <arg name="joystick" default="true" />
+  <!-- <arg name="joystick" default="true" /> -->
 
   <group ns="$(arg robot_namespace)">
 
@@ -20,8 +20,10 @@
     </include>
 
     <include file="$(find husky_control)/launch/teleop.launch">
-        <arg name="joystick" value="$(arg joystick)" />
+        <!-- <arg name="joystick" value="$(arg joystick)" /> -->
+        <arg name="joystick" value="true" />
     </include>
+
     <!-- Spawn robot in gazebo -->
     <node name="spawn_robot_model" pkg="gazebo_ros" type="spawn_model"
         args="-x $(arg x)

@@ -285,8 +285,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
       <frameId>base_link</frameId>
       <topicName>navsat/fix</topicName>
       <velocityTopicName>navsat/vel</velocityTopicName>
-      <referenceLatitude>24.785823</referenceLatitude>
-      <referenceLongitude>120.997496</referenceLongitude>
+      <referenceLatitude>24.7858</referenceLatitude>
+      <referenceLongitude>120.9975</referenceLongitude>
       <referenceHeading>0</referenceHeading>
       <referenceAltitude>0</referenceAltitude>
       <drift>0.0001 0.0001 0.0001</drift>
