@@ -40,7 +40,7 @@ group "01_WAM-V_World" {
 
     group "03_navigation" {
         cmd "01_navigation_points" {
-            exec = "roslaunch navigation multipoint_wamv.launch veh:=wamv_1 world:=wamv model:=wamv radius:=1.5";
+            exec = "roslaunch navigation multipoint_wamv.launch veh:=wamv_1 world:=wamv model:=wamv radius:=5.5";
             host = "localhost";
         }
         cmd "02_RL_navigation" {
