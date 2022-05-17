@@ -151,24 +151,166 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        base_footprint:
+          Value: true
+        base_link:
+          Value: true
+        bumper_link:
+          Value: true
+        front_bumper_link:
+          Value: true
+        front_laser:
+          Value: true
+        front_left_wheel_link:
+          Value: true
+        front_right_wheel_link:
+          Value: true
+        imu_link:
+          Value: true
+        inertial_link:
+          Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
+        rear_bumper_link:
+          Value: true
+        rear_left_wheel_link:
+          Value: true
+        rear_right_wheel_link:
+          Value: true
+        top_chassis_link:
+          Value: true
+        top_plate_front_link:
+          Value: true
+        top_plate_link:
+          Value: true
+        top_plate_rear_link:
+          Value: true
+        user_rail_link:
+          Value: true
+        uwb_anchor_0:
+          Value: true
+        uwb_anchor_1:
+          Value: true
+        uwb_anchor_10:
+          Value: true
+        uwb_anchor_11:
+          Value: true
+        uwb_anchor_12:
+          Value: true
+        uwb_anchor_13:
+          Value: true
+        uwb_anchor_14:
+          Value: true
+        uwb_anchor_15:
+          Value: true
+        uwb_anchor_16:
+          Value: true
+        uwb_anchor_17:
+          Value: true
+        uwb_anchor_2:
+          Value: true
+        uwb_anchor_3:
+          Value: true
+        uwb_anchor_4:
+          Value: true
+        uwb_anchor_5:
+          Value: true
+        uwb_anchor_6:
+          Value: true
+        uwb_anchor_7:
+          Value: true
+        uwb_anchor_8:
+          Value: true
+        uwb_anchor_9:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          base_link:
+            base_footprint:
+              {}
+            bumper_link:
+              {}
+            front_bumper_link:
+              {}
+            front_laser:
+              {}
+            front_left_wheel_link:
+              {}
+            front_right_wheel_link:
+              {}
+            imu_link:
+              {}
+            inertial_link:
+              {}
+            rear_bumper_link:
+              {}
+            rear_left_wheel_link:
+              {}
+            rear_right_wheel_link:
+              {}
+            top_chassis_link:
+              {}
+            top_plate_link:
+              top_plate_front_link:
+                {}
+              top_plate_rear_link:
+                {}
+            user_rail_link:
+              {}
+          uwb_anchor_0:
+            {}
+          uwb_anchor_1:
+            {}
+          uwb_anchor_10:
+            {}
+          uwb_anchor_11:
+            {}
+          uwb_anchor_12:
+            {}
+          uwb_anchor_13:
+            {}
+          uwb_anchor_14:
+            {}
+          uwb_anchor_15:
+            {}
+          uwb_anchor_16:
+            {}
+          uwb_anchor_17:
+            {}
+          uwb_anchor_2:
+            {}
+          uwb_anchor_3:
+            {}
+          uwb_anchor_4:
+            {}
+          uwb_anchor_5:
+            {}
+          uwb_anchor_6:
+            {}
+          uwb_anchor_7:
+            {}
+          uwb_anchor_8:
+            {}
+          uwb_anchor_9:
+            {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 3.7895312309265137
-        Min Value: -0.008170068264007568
+        Max Value: 3.7878522872924805
+        Min Value: -0.009854525327682495
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -313,25 +455,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 88.31932067871094
+      Distance: 68.83210754394531
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -2.369802236557007
-        Y: 1.1852957010269165
-        Z: -8.405288696289062
+        X: 3.815448522567749
+        Y: 2.8221285343170166
+        Z: 2.6324684619903564
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.1503974199295044
+      Pitch: 1.5647963285446167
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.5853891372680664
+      Yaw: 1.5703891515731812
     Saved: ~
 Window Geometry:
   Displays:
