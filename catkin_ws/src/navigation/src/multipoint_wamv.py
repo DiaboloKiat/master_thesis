@@ -43,15 +43,19 @@ class multipoint():
         self.record = np.zeros([self.iteration])
         self.record_collision = np.zeros([self.iteration])
         self.record_time = np.zeros([self.iteration])
+        self.record_docker = np.zeros([self.iteration])
         self.collision = 0
         self.collision_states = False
         self.start_time = 0
         self.docking = False
+        self.docker_num = 0
+        self.time = 0
 
         self.robot_pose = [0.0, 0.0]
+        self.robot_pose_tf = [0.0, 0.0]
         self.stop = False
         self.cmd_drive = Twist()
-        self.robot_radius = float(rospy.get_param("~robot_radius", "0.5"))
+        self.robot_radius = float(rospy.get_param("~robot_radius", "5.5"))
         self.yaw = 0
         self.model = rospy.get_param("~model", "wamv")
         print("Robot Radius: ", self.robot_radius)
@@ -60,7 +64,7 @@ class multipoint():
         self.docker_1 = [(-533, 218, 3.14),(-543, 218, 3.14),(-553, 218, 3.14)]
         self.docker_2 = [(-533, 224, 3.14),(-543, 224, 3.14),(-553, 224, 3.14)]
         self.docker_3 = [(-533, 230, 3.14),(-543, 230, 3.14),(-553, 230, 3.14)]
-        self.pt_list = [(-510, 224, 3.14),(-553, 218, 3.14),(-553, 224, 3.14),(-553, 230, 3.14)]
+        self.pt_list = [(-520, 224, 3.14),(-553, 218, 3.14),(-553, 224, 3.14),(-553, 230, 3.14)]
 
         self.final_goal = None # The final goal that you want to arrive
         self.goal = None
@@ -75,24 +79,59 @@ class multipoint():
         self.Markers = MarkerArray()
         self.Markers.markers = []
         
-        self.sub = rospy.Subscriber("odometry", Odometry, self.cb_odom, queue_size=1)
+        self.sub = rospy.Subscriber("posestamped", PoseStamped, self.cb_odom, queue_size=1)
+        self.sub_tf = rospy.Subscriber("posestamped_tf", PoseStamped, self.cb_odom_tf, queue_size=1)
         self.sub_collision = rospy.Subscriber("bumper_states", ContactsState, self.cb_collision, queue_size=1)
 
         self.initial_state()
 
+    def cb_odom_tf(self, msg):
+        self.robot_pose_tf = [msg.pose.position.x, msg.pose.position.y]
+
+    def cb_time(self):
+        dt = rospy.Duration(secs=600) / 1000000000
+        new = rospy.Time.now()
+        self.time = ((new - self.start_time) / 1000000000)
+        # print(self.time, dt)
+
+        if self.time > dt:
+            self.time = rospy.Time.now()
+            self.record[self.epoch] = 0
+            self.record_collision[self.epoch] = self.collision
+            self.record_docker[self.epoch] = self.docker_num
+            self.record_time[self.epoch] = str((self.time - self.start_time)/1000000000)
+            print (self.record_docker[self.epoch], self.epoch, self.record[self.epoch], self.record_collision[self.epoch], self.record_time[self.epoch])
+            self.epoch += 1
+            self.initial_state()
+            self.start_time = rospy.Time.now()
+            print(self.start_time)
+
     def cb_odom(self, msg):
         self.get_marker()
-        self.robot_pose = [msg.pose.pose.position.x, msg.pose.pose.position.y]
+        
+        self.robot_pose = [msg.pose.position.x, msg.pose.position.y]
 
         goal_distance = self.get_distance(self.robot_pose, self.goal)
-        
+        goal_distance_tf = self.get_distance(self.robot_pose_tf, self.goal)
+
         if self.final_goal == self.goal and goal_distance < self.robot_radius and self.stop == False:
+            self.time = rospy.Time.now()
             self.record[self.epoch] = 1
             self.record_collision[self.epoch] = self.collision
-            time = rospy.Time.now()
-            print((time - self.start_time)/1000000000)
-            self.record_time[self.epoch] = str((time - self.start_time)/1000000000)
-            print (self.epoch, self.record[self.epoch], self.record_collision[self.epoch])
+            self.record_docker[self.epoch] = self.docker_num
+            self.record_time[self.epoch] = str((self.time - self.start_time)/1000000000)
+            print (self.record_docker[self.epoch], self.epoch, self.record[self.epoch], self.record_collision[self.epoch], self.record_time[self.epoch])
+            self.epoch += 1
+            self.initial_state()
+            self.start_time = rospy.Time.now()
+            print(self.start_time)
+        elif self.collision > 50:
+            self.time = rospy.Time.now()
+            self.record[self.epoch] = 0
+            self.record_collision[self.epoch] = self.collision
+            self.record_docker[self.epoch] = self.docker_num
+            self.record_time[self.epoch] = str((self.time - self.start_time)/1000000000)
+            print (self.record_docker[self.epoch], self.epoch, self.record[self.epoch], self.record_collision[self.epoch], self.record_time[self.epoch])
             self.epoch += 1
             self.initial_state()
             self.start_time = rospy.Time.now()
@@ -102,19 +141,19 @@ class multipoint():
             self.goal = self.points.get()
             print ("boat: ", self.goal)
         elif goal_distance < self.robot_radius and self.stop == False:
-            goal = random.randint(1, 3)
-            print(goal)
-            if goal == 1:
+            self.docker_num = random.randint(1, 3)
+            print(self.docker_num)
+            if self.docker_num == 1:
                 self.p_list = self.docker_1
                 print(self.p_list)
-            elif goal == 2:
+            elif self.docker_num == 2:
                 self.p_list = self.docker_2
                 print(self.p_list)
-            elif goal == 3:
+            elif self.docker_num == 3:
                 self.p_list = self.docker_3
                 print(self.p_list)
             
-            self.final_goal = self.pt_list[goal]
+            self.final_goal = self.pt_list[self.docker_num]
 
             for i,point in enumerate(self.p_list):
                 self.points.put(point)
@@ -122,7 +161,9 @@ class multipoint():
             self.goal = self.points.get()
             print ("boat: ", self.goal)
             self.docking = True
-
+            self.robot_radius = 1.5
+            print("Robot Radius: ", self.robot_radius)
+        
         if self.epoch == self.iteration and self.stop == False:
             folder = '/home/kiat_thesis/master_thesis/bag'
             record_name = 'uwb_navigation_wamv.csv'
@@ -131,6 +172,7 @@ class multipoint():
             writer.writerow(self.record)
             writer.writerow(self.record_collision)
             writer.writerow(self.record_time)
+            writer.writerow(self.record_docker)
             fileObject.close()
             self.stop = True
 
@@ -138,6 +180,7 @@ class multipoint():
             self.start_time = rospy.Time.now()
             print(self.start_time)
   
+        self.cb_time()
         pose = PoseStamped()
         pose.header = Header()
         pose.header.frame_id = "map"
@@ -202,6 +245,7 @@ class multipoint():
         self.state_msg.pose.position.z = 0.1
 
         if self.stop == False:
+            self.robot_radius = 5.5
             self.points = queue.Queue(maxsize=20)
             self.p_list = []
 

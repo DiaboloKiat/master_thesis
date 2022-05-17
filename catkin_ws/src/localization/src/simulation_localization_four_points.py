@@ -99,7 +99,7 @@ class simulation_localization():
                 self.pose[2] = 0.0
 
         elif len(self.all_destination_id) < 18:
-            print(len(self.all_destination_id))
+            # print(len(self.all_destination_id))
             self.pose[0] = np.nan
             self.pose[1] = np.nan
             self.pose[2] = np.nan
