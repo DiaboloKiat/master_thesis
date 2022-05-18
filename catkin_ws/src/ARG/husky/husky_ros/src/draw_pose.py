@@ -13,9 +13,6 @@ import numpy as np
 
 class Drawer(object):
     def __init__(self):
-        # self.pub_markers = rospy.Publisher('route', MarkerArray, queue_size=1)
-        self.pub_path = rospy.Publisher('route', Path, queue_size=1)
-
         self.marray = MarkerArray()
         self.path = Path()
         self.path.header.frame_id = 'map'
@@ -23,6 +20,9 @@ class Drawer(object):
         self.transformer = TransformerROS()
         self.sub_topic = rospy.get_param("~sub_topic", "posestamped")
         self.pub_topic = rospy.get_param("~pub_topic", "route")
+
+        # self.pub_markers = rospy.Publisher('route', MarkerArray, queue_size=1)
+        self.pub_path = rospy.Publisher(self.pub_topic, Path, queue_size=1)
 
         sub_pose = rospy.Subscriber(self.sub_topic, PoseStamped, self.to_pub, queue_size=1)
 

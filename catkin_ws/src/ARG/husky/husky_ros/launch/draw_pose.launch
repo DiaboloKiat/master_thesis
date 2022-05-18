@@ -1,6 +1,6 @@
 <launch>
     <arg name="veh" default="robot"/>
-    <arg name="sub_topic" default="posestamped"/>
+    <arg name="sub_topic" default="posestamped_tf"/>
     <arg name="pub_topic" default="route"/>
 
 
