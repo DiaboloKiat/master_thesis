@@ -73,7 +73,7 @@ class multipoint():
         # print ("boat: ", self.goal)
 
         if self.start_time == 0:
-            time.sleep(2.0)
+            time.sleep(1.0)
             self.start_time = rospy.Time.now()
             print(self.start_time)
 

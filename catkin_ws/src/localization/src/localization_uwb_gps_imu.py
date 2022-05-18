@@ -19,6 +19,7 @@ from math import sqrt
 from math import pow
 from math import atan2
 from scipy.stats import norm
+from std_msgs.msg import Header
 
 class localization_uwb_gps_imu():
     def __init__(self):
@@ -190,6 +191,8 @@ class localization_uwb_gps_imu():
         self.prior_location_y = y
         prior_time = rospy.get_rostime()
         
+        self.posestamped.header = Header()
+        self.posestamped.header.frame_id = "map"
         self.posestamped.pose.position.x = self.odometry.pose.pose.position.x
         self.posestamped.pose.position.y = self.odometry.pose.pose.position.y
         self.posestamped.pose.position.z = self.odometry.pose.pose.position.z
@@ -289,6 +292,8 @@ class localization_uwb_gps_imu():
         self.prior_location_y = y
         prior_time = rospy.get_rostime()
         
+        self.posestamped.header = Header()
+        self.posestamped.header.frame_id = "map"
         self.posestamped.pose.position.x = self.odometry.pose.pose.position.x
         self.posestamped.pose.position.y = self.odometry.pose.pose.position.y
         self.posestamped.pose.position.z = self.odometry.pose.pose.position.z

@@ -211,9 +211,9 @@ class simulation_localization():
                 # print(a_, c_)
 
                 if y_max > 0:
-                    self.two_pose[1] = y_max - (y_max - y_min)/2
+                    self.two_pose[1] = (y_max - (y_max - y_min)/2) + 0.00001
                 else:
-                    self.two_pose[1] = (y_max - y_min)/2 + y_min
+                    self.two_pose[1] = ((y_max - y_min)/2 + y_min) + 0.00001
 
                 self.two_pose[0] = x_max - a_
                 self.two_pose[2] = 0.0
@@ -225,9 +225,9 @@ class simulation_localization():
                 c_ = ( (c / (a+c)) * (y_max - y_min) )
                 # print(a_, c_)
                 if x_max > 0:
-                    self.two_pose[0] = x_max - (x_max - x_min)/2
+                    self.two_pose[0] = (x_max - (x_max - x_min)/2) + 0.00001
                 else:
-                    self.two_pose[0] = (x_max - x_min)/2 + x_min
+                    self.two_pose[0] = ((x_max - x_min)/2 + x_min) + 0.00001
 
                 self.two_pose[1] = y_max - c_
                 self.two_pose[2] = 0.0     
