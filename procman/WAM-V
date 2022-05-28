@@ -14,7 +14,7 @@ group "01_WAM-V_World" {
             host = "localhost";
         }
         cmd "03_wanv_gazebo_tf" {
-            exec = "roslaunch localization localization_tf.launch veh:=wamv_1 frame_name:=/wamv_1/base_link modelstate_index:=12";
+            exec = "roslaunch localization localization_tf.launch veh:=wamv_1 frame_name:=/wamv_1/base_link modelstate_index:=13";
             host = "localhost";
         }
         cmd "04_pozyx_setup" {
@@ -25,7 +25,7 @@ group "01_WAM-V_World" {
 
     group "02_pozyx_ranging_localization" {
         cmd "01_ranging" {
-            exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=wamv_1 world:=wamv modelstate_index:=12";
+            exec = "roslaunch pozyx_simulation uwb_simulation_ranging.launch veh:=wamv_1 world:=wamv modelstate_index:=13";
             host = "localhost";
         }
         cmd "02_simulation_localization" {
