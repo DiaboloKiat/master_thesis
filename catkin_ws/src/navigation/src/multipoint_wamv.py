@@ -240,7 +240,7 @@ class multipoint():
         self.state_msg.pose.orientation.z = quat[2]
         self.state_msg.pose.orientation.w = quat[3]
 
-        self.state_msg.pose.position.x = random.uniform(-450, -500) #-532
+        self.state_msg.pose.position.x = random.uniform(-400, -450) #-532
         self.state_msg.pose.position.y = random.uniform(200, 250) #162
         self.state_msg.pose.position.z = 0.1
 

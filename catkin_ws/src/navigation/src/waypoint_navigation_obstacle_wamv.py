@@ -106,45 +106,49 @@ class waypoint_navigation_obstacle():
 
         goal_angle = self.get_goal_angle(self.yaw, self.robot_pose, self.goal)
 
-        if goal_distance < self.station_keeping_distance or self.start_station_keeping:
-            pos_output, ang_output = self.station_keeping(goal_distance, goal_angle)
-        else:
-            if self.docking == False:
-                if self.lidar_distances['front'] < 2.5 and self.lidar_distances['fleft'] < 2.5 and self.lidar_distances['fright'] < 2.5:
-                    # move back
-                    pos_output = -1.0
-                    ang_output = 0.0
-                    self.publish_data(pos_output, ang_output)
-                    time.sleep(20)
-                elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
-                    # move to the right
-                    pos_output = 0.0 
-                    ang_output = -0.3
-                elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] < 3:
-                    # move to the left
-                    pos_output = 0.0 
-                    ang_output = 0.3
-                elif self.lidar_distances['front'] > 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
-                    # move to the right
-                    pos_output = 0.0
-                    ang_output = -0.3
-                elif self.lidar_distances['front'] > 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] < 3:
-                    # move to the left
-                    pos_output = 0.0 
-                    ang_output = 0.3
-                elif self.lidar_distances['fleft'] < 3:
-                    # move to the right
-                    pos_output = 0.0
-                    ang_output = -0.3
-                elif self.lidar_distances['fright'] < 3:
-                    # move to the left
-                    pos_output = 0.0 
-                    ang_output = 0.3
-                else:
-                    pos_output, ang_output = self.control(goal_distance, goal_angle)
+
+        if self.docking == False:
+            if self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] < 3:
+                # move back
+                pos_output = -1.0
+                ang_output = 0.0
+                self.publish_data(pos_output, ang_output)
+                time.sleep(5)
+            elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
+                # move to the right
+                pos_output = 0.0 
+                ang_output = -0.3
+            elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] < 3:
+                # move to the left
+                pos_output = 0.0 
+                ang_output = 0.3
+            elif self.lidar_distances['front'] > 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
+                # move to the right
+                pos_output = 0.0
+                ang_output = -0.3
+            elif self.lidar_distances['front'] > 3 and self.lidar_distances['fleft'] > 3 and self.lidar_distances['fright'] < 3:
+                # move to the left
+                pos_output = 0.0 
+                ang_output = 0.3
+            elif self.lidar_distances['front'] < 7 or self.lidar_distances['fleft'] < 7 or self.lidar_distances['fright'] < 7:
+                # move slow
+                pos_output, ang_output = self.control(goal_distance, goal_angle)
+                pos_output = 0.1 
+            elif self.lidar_distances['fleft'] < 3:
+                # move to the right
+                pos_output = 0.0
+                ang_output = -0.5
+            elif self.lidar_distances['fright'] < 3:
+                # move to the left
+                pos_output = 0.0 
+                ang_output = 0.5
             else:
                 pos_output, ang_output = self.control(goal_distance, goal_angle)
-
+            
+            
+        else:
+            pos_output, ang_output = self.control(goal_distance, goal_angle)
+        
         self.publish_data(pos_output, ang_output)
 
     def control(self, goal_distance, goal_angle):
@@ -200,11 +204,11 @@ class waypoint_navigation_obstacle():
         self.goal = np.array([msg.pose.position.x, msg.pose.position.y])
         # print(self.goal)
 
-        if self.goal[0] != -520:
-            self.docking = True
-            # print(self.docking)
-        elif self.goal[0] == -520:
+        if self.goal[0] != -553:
             self.docking = False
+            # print(self.docking)
+        elif self.goal[0] == -553:
+            self.docking = True
             # print(self.docking)
 
     def initialize_PID(self):
@@ -226,11 +230,11 @@ class waypoint_navigation_obstacle():
             else:
                 self.count += 1
                 # print(self.count)
-        elif msg.states != [] and self.count == 0:
-            pos_output = -1.0
-            ang_output = 0.0
-            self.publish_data(pos_output, ang_output)
-            time.sleep(10)
+        # elif msg.states != [] and self.count == 0:
+            # pos_output = -1.0
+            # ang_output = 0.0
+            # self.publish_data(pos_output, ang_output)
+            # time.sleep(10)
         else:
             self.collision_states = False
             self.count = 0
@@ -276,7 +280,7 @@ class waypoint_navigation_obstacle():
         'left':   min(min(msg.ranges[576:718]), 10),
         }
 
-        # print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
+        print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
 
     def angle_range(self, angle): # limit the angle to the range of [-180, 180]
         if angle > 180:

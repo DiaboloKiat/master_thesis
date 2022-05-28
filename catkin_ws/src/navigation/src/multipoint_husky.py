@@ -184,7 +184,7 @@ class multipoint():
         self.state_msg.pose.orientation.z = quat[2]
         self.state_msg.pose.orientation.w = quat[3]
 
-        self.state_msg.pose.position.x = 36.5
+        self.state_msg.pose.position.x = 34.5
         self.state_msg.pose.position.y = -23.5
         self.state_msg.pose.position.z = 0.13
 

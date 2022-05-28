@@ -35,7 +35,7 @@ class simulation_localization():
         rospy.Subscriber("uwb_data_distance", uwb_data, self.subscribe_data, queue_size=1)
 
         # self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
-        self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=10)
+        self.pub_data = rospy.Publisher('localization_data_topic', PoseStamped, queue_size=1)
 
     def position_calculation(self):
         self.uwb_transient_id = []
