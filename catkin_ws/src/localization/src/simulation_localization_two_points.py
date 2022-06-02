@@ -56,7 +56,7 @@ class simulation_localization():
             uwb_range = self.all_distance[i]
 
             if not np.isnan(uwb_range):
-                if count < 2 and uwb_range < 21000:
+                if count < 2 and uwb_range < 25000:
                     if i == 0:
                         if self.all_distance[2] < 20000:
                             pass
@@ -156,8 +156,8 @@ class simulation_localization():
                         count += 1
 
 
-                    # count += 1
-                    # print(count)
+                    count += 1
+                    print(count)
                 
 
         if sensor_pose_transient[0][0] > sensor_pose_transient[1][0]:

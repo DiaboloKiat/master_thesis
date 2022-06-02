@@ -27,8 +27,8 @@ class localization_error(object):
         self.robot_pose_y = 0
         self.robot_pose_z = 0
 
-        self.robot_pose_tf_x = 26.16
-        self.robot_pose_tf_y = -24.125
+        self.robot_pose_tf_x = 5
+        self.robot_pose_tf_y = 7
         self.robot_pose_tf_z = 0
 
         self.pub_error = rospy.Publisher("localization_error", Float64, queue_size=1)

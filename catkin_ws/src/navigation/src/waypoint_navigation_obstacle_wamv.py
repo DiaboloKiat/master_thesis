@@ -130,7 +130,7 @@ class waypoint_navigation_obstacle():
                 # move to the left
                 pos_output = 0.0 
                 ang_output = 0.3
-            elif self.lidar_distances['front'] < 7 or self.lidar_distances['fleft'] < 7 or self.lidar_distances['fright'] < 7:
+            elif self.lidar_distances['front'] < 9 or self.lidar_distances['fleft'] < 9 or self.lidar_distances['fright'] < 9:
                 # move slow
                 pos_output, ang_output = self.control(goal_distance, goal_angle)
                 pos_output = 0.1 

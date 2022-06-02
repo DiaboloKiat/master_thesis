@@ -85,7 +85,7 @@ class localization_uwb_gps_imu():
             self.pose_gps.position.z = 0
         elif self.utm_zone == 51:
             self.pose_gps.position.x = (utm_point.easting - self.utm_orig.easting) * 1000
-            self.pose_gps.position.y = (utm_point.northing - self.utm_orig.northing) * 1000
+            self.pose_gps.position.y = (utm_point.northing - self.utm_orig.northing) * 1000 + 10000
             self.pose_gps.position.z = 0
         elif self.utm_zone == 56:
             self.pose_gps.position.x = (utm_point.easting - self.utm_orig.easting) * 1000
