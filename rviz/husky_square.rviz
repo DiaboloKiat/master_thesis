@@ -72,6 +72,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        bumper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         front_bumper_link:
           Alpha: 1
           Show Axes: false
@@ -153,6 +158,8 @@ Visualization Manager:
           Value: true
         base_link:
           Value: true
+        bumper_link:
+          Value: true
         front_bumper_link:
           Value: true
         front_laser:
@@ -203,6 +210,8 @@ Visualization Manager:
           base_link:
             base_footprint:
               {}
+            bumper_link:
+              {}
             front_bumper_link:
               {}
             front_laser:
@@ -232,19 +241,15 @@ Visualization Manager:
               {}
           uwb_anchor_0:
             {}
-          uwb_anchor_1:
-            {}
           uwb_anchor_2:
-            {}
-          uwb_anchor_3:
             {}
       Update Interval: 0
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 2.5459580421447754
-        Min Value: -0.007541239261627197
+        Max Value: 2.530080795288086
+        Min Value: -0.008829206228256226
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -345,18 +350,18 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2.1092190742492676
-        Y: 1.6515120267868042
-        Z: -5.007019996643066
+        X: -0.21112768352031708
+        Y: 1.8287619352340698
+        Z: -4.393978118896484
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8697969913482666
+      Pitch: 0.9047969579696655
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.1553895473480225
+      Yaw: 4.725392818450928
     Saved: ~
 Window Geometry:
   Displays:
