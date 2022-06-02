@@ -23,7 +23,7 @@
           </surface>
         </collision>
 
-        <visual name='one_one'>
+        <!-- <visual name='one_one'>
           <pose>-5 -5 0.25 0 0 0</pose>
           <geometry>
             <cylinder>
@@ -325,7 +325,7 @@
               <name>Gazebo/White</name>
             </script>
           </material>
-        </visual>
+        </visual>-->
 
         <!-- Draw Hexagon -->
         <collision name='left_hand'>
