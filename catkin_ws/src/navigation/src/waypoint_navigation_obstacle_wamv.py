@@ -108,12 +108,10 @@ class waypoint_navigation_obstacle():
 
 
         if self.docking == False:
-            if self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] < 3:
+            if self.lidar_distances['front'] < 3:
                 # move back
-                pos_output = -1.0
+                pos_output = -10.0
                 ang_output = 0.0
-                self.publish_data(pos_output, ang_output)
-                time.sleep(5)
             elif self.lidar_distances['front'] < 3 and self.lidar_distances['fleft'] < 3 and self.lidar_distances['fright'] > 3:
                 # move to the right
                 pos_output = 0.0 
@@ -130,6 +128,14 @@ class waypoint_navigation_obstacle():
                 # move to the left
                 pos_output = 0.0 
                 ang_output = 0.3
+            elif self.lidar_distances['rfront'] < 4:
+                # move to the left
+                pos_output = 0.0 
+                ang_output = 0.5
+            elif self.lidar_distances['lfront'] < 4:
+                # move to the right
+                pos_output = 0.0
+                ang_output = -0.5 
             elif self.lidar_distances['front'] < 9 or self.lidar_distances['fleft'] < 9 or self.lidar_distances['fright'] < 9:
                 # move slow
                 pos_output, ang_output = self.control(goal_distance, goal_angle)
@@ -137,11 +143,11 @@ class waypoint_navigation_obstacle():
             elif self.lidar_distances['fleft'] < 3:
                 # move to the right
                 pos_output = 0.0
-                ang_output = -0.5
+                ang_output = -0.3
             elif self.lidar_distances['fright'] < 3:
                 # move to the left
                 pos_output = 0.0 
-                ang_output = 0.5
+                ang_output = 0.3
             else:
                 pos_output, ang_output = self.control(goal_distance, goal_angle)
             
@@ -155,12 +161,13 @@ class waypoint_navigation_obstacle():
         self.pos_control.update(goal_distance)
         self.ang_control.update(goal_angle)
 
+        print(self.pos_control.output, self.ang_control.output)
         # pos_output will always be positive
         pos_output = self.pos_constrain(- self.pos_control.output/self.dis4constV)
 
         # -1 = -180/180 < output/180 < 180/180 = 1
         ang_output = self.ang_control.output/180
-
+        # print(pos_output, ang_output)
         return pos_output, ang_output
 
     def station_keeping(self, goal_distance, goal_angle):
@@ -273,14 +280,20 @@ class waypoint_navigation_obstacle():
         # print msg.ranges[718]
 
         self.lidar_distances = {
-        'right':  min(min(msg.ranges[0:143]), 10),
-        'fright': min(min(msg.ranges[144:287]), 10),
+        # 'right':  min(min(msg.ranges[0:143]), 10),
+        # 'fright': min(min(msg.ranges[144:287]), 10),
+        # 'front':  min(min(msg.ranges[288:431]), 10),
+        # 'fleft':  min(min(msg.ranges[432:575]), 10),
+        # 'left':   min(min(msg.ranges[576:718]), 10),
+        'fright': min(min(msg.ranges[0:287]), 10),
+        'rfront':  min(min(msg.ranges[288:359]), 10),
         'front':  min(min(msg.ranges[288:431]), 10),
-        'fleft':  min(min(msg.ranges[432:575]), 10),
-        'left':   min(min(msg.ranges[576:718]), 10),
+        'lfront':  min(min(msg.ranges[360:431]), 10),
+        'fleft':  min(min(msg.ranges[432:718]), 10),
         }
 
         print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
+        # print(self.lidar_distances['front'], self.lidar_distances['fright'], self.lidar_distances['fleft'])
 
     def angle_range(self, angle): # limit the angle to the range of [-180, 180]
         if angle > 180:

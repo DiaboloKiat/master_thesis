@@ -5,6 +5,7 @@ import message_filters
 import tf
 import math
 import numpy as np
+import random
 
 from sensor_msgs.msg import NavSatFix, Imu
 from nav_msgs.msg import Odometry
@@ -57,7 +58,9 @@ class localization_uwb_gps_imu():
         self.prior_location_y = 0
         self.prior_time = 0
         self.time = 0
-
+        self.gain_x = 5784
+        self.gain_y = 5129
+ 
         self.pub_odometry = rospy.Publisher("odometry", Odometry, queue_size=1)
         self.pub_posestamped = rospy.Publisher("posestamped", PoseStamped, queue_size=1)
 
@@ -85,12 +88,28 @@ class localization_uwb_gps_imu():
             self.pose_gps.position.z = 0
         elif self.utm_zone == 51:
             self.pose_gps.position.x = (utm_point.easting - self.utm_orig.easting) * 1000
-            self.pose_gps.position.y = (utm_point.northing - self.utm_orig.northing) * 1000 + 10000
+            self.pose_gps.position.y = (utm_point.northing - self.utm_orig.northing) * 1000
             self.pose_gps.position.z = 0
         elif self.utm_zone == 56:
             self.pose_gps.position.x = (utm_point.easting - self.utm_orig.easting) * 1000
             self.pose_gps.position.y = (utm_point.northing - self.utm_orig.northing) * 1000
             self.pose_gps.position.z = 0
+
+            noise = (np.random.normal(0, 2, 1) * 1000)
+
+            if self.pose_gps.position.x < 0:
+                self.pose_gps.position.x = self.pose_gps.position.x - self.gain_x
+                self.pose_gps.position.x = self.pose_gps.position.x - noise
+            else:
+                self.pose_gps.position.x = self.pose_gps.position.x + self.gain_x
+                self.pose_gps.position.x = self.pose_gps.position.x + noise
+            
+            if self.pose_gps.position.y < 0:
+                self.pose_gps.position.y = self.pose_gps.position.y - self.gain_y
+                self.pose_gps.position.y = self.pose_gps.position.y - noise
+            else:
+                self.pose_gps.position.y = self.pose_gps.position.y + self.gain_y
+                self.pose_gps.position.y = self.pose_gps.position.y + noise
 
         print("X = ", self.pose_gps.position.x, ", Y = ", self.pose_gps.position.y, ", Z = ", self.pose_gps.position.z)
         print("========================================================")
@@ -103,11 +122,11 @@ class localization_uwb_gps_imu():
         self.cb_uwb(msg_uwb)
         self.cb_gps(msg_gps)
         self.cb_imu(msg_imu)
-        if np.isnan(msg_uwb.pose.position.x) or np.isnan(msg_uwb.pose.position.y) or np.isnan(msg_uwb.pose.position.z):
-            self.kalman_filter_gps()
-        else:
-            self.kalman_filter_uwb()
-        # self.kalman_filter_gps()
+        # if np.isnan(msg_uwb.pose.position.x) or np.isnan(msg_uwb.pose.position.y) or np.isnan(msg_uwb.pose.position.z):
+        #     self.kalman_filter_gps()
+        # else:
+        #     self.kalman_filter_uwb()
+        self.kalman_filter_gps()
 
     def kalman_filter_gps(self):
         q = (self.pose_gps.orientation.x, self.pose_gps.orientation.y, self.pose_gps.orientation.z, self.pose_gps.orientation.w)

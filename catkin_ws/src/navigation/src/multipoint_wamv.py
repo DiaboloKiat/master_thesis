@@ -114,7 +114,7 @@ class multipoint():
         goal_distance = self.get_distance(self.robot_pose, self.goal)
         goal_distance_tf = self.get_distance(self.robot_pose_tf, self.goal)
 
-        if self.final_goal == self.goal and goal_distance < self.robot_radius and self.stop == False:
+        if self.final_goal == self.goal and goal_distance_tf < self.robot_radius and self.stop == False:
             self.time = rospy.Time.now()
             self.record[self.epoch] = 1
             self.record_collision[self.epoch] = self.collision
@@ -136,11 +136,11 @@ class multipoint():
             self.initial_state()
             self.start_time = rospy.Time.now()
             print(self.start_time)
-        elif goal_distance < self.robot_radius and self.docking == True:
+        elif goal_distance_tf < self.robot_radius and self.docking == True and self.final_goal != self.goal:
             self.points.put(self.goal)
             self.goal = self.points.get()
             print ("boat: ", self.goal)
-        elif goal_distance < self.robot_radius and self.stop == False:
+        elif goal_distance_tf < self.robot_radius and self.stop == False and self.docking == False:
             self.docker_num = random.randint(1, 3)
             print(self.docker_num)
             if self.docker_num == 1:
@@ -161,7 +161,7 @@ class multipoint():
             self.goal = self.points.get()
             print ("boat: ", self.goal)
             self.docking = True
-            self.robot_radius = 1.5
+            self.robot_radius = 2.0
             print("Robot Radius: ", self.robot_radius)
         
         if self.epoch == self.iteration and self.stop == False:
