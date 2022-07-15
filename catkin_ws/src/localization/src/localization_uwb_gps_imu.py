@@ -122,11 +122,11 @@ class localization_uwb_gps_imu():
         self.cb_uwb(msg_uwb)
         self.cb_gps(msg_gps)
         self.cb_imu(msg_imu)
-        # if np.isnan(msg_uwb.pose.position.x) or np.isnan(msg_uwb.pose.position.y) or np.isnan(msg_uwb.pose.position.z):
-        #     self.kalman_filter_gps()
-        # else:
-        #     self.kalman_filter_uwb()
-        self.kalman_filter_gps()
+        if np.isnan(msg_uwb.pose.position.x) or np.isnan(msg_uwb.pose.position.y) or np.isnan(msg_uwb.pose.position.z):
+            self.kalman_filter_gps()
+        else:
+            self.kalman_filter_uwb()
+        # self.kalman_filter_gps()
 
     def kalman_filter_gps(self):
         q = (self.pose_gps.orientation.x, self.pose_gps.orientation.y, self.pose_gps.orientation.z, self.pose_gps.orientation.w)
