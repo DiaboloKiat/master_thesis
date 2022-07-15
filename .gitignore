@@ -1,7 +1,6 @@
 build/
 devel/
 __pycache__/
-CMakeLists.txt
 
 
 .catkin_workspace
